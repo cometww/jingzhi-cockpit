@@ -99,6 +99,7 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:v
 @media(max-width:1100px){.chartgrid{grid-template-columns:1fr}}
 /* ---------- 移动端 / 平板 / 鸿蒙适配 ---------- */
 @media(max-width:768px){
+  .updbar,#updPanel,.updnote{display:none}
   body{font-size:13px;-webkit-text-size-adjust:100%}
   header{padding:16px 12px 12px}
   header h1{font-size:19px}
@@ -145,7 +146,7 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:v
     <span id="updLast" class="updstatus"></span>
   </div>
   <div id="updPanel"></div>
-  <div style="font-size:12px;color:#9fb6d4;margin-top:8px">⏱ 自动检查:每 30 分钟一次(页面打开时生效),检查文件夹资料与每人最新周报是否有变化,有变化会在上方提示。</div>
+  <div class="updnote" style="font-size:12px;color:#9fb6d4;margin-top:8px">⏱ 自动检查:每 30 分钟一次(页面打开时生效),检查文件夹资料与每人最新周报是否有变化,有变化会在上方提示。</div>
 </header>
 <div class="tabs" id="tabs"></div>
 <div class="wrap" id="content"></div>
@@ -1049,11 +1050,16 @@ function kpi(k,v,d,cls){
 function updList(ups){
   return '<ul>'+ups.map(u=>'<li><b>'+u.type+'</b> · '+u.file+(u.mtime?' · '+u.mtime:'')+(u.size?' · '+(u.size/1024/1024).toFixed(1)+'MB':'')+'</li>').join('')+'</ul>';
 }
+function fetchT(url,opt){
+  const ctrl=new AbortController();
+  const t=setTimeout(()=>ctrl.abort(),4500);
+  return fetch(url,Object.assign({cache:'no-store',signal:ctrl.signal},opt)).finally(()=>clearTimeout(t));
+}
 function checkUpdate(){
   const st=document.getElementById('updStatus');
   const p=document.getElementById('updPanel');
   st.textContent='检查中…';
-  fetch('http://127.0.0.1:8765/api/check',{cache:'no-store'})
+  fetchT('http://127.0.0.1:8765/api/check')
   .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
   .then(d=>{
     if(d.hasUpdate){
@@ -1084,12 +1090,20 @@ function checkUpdate(){
     }
   })
   .catch(e=>{
-    p.innerHTML='<div class="updbox err"><b>未连接电脑端检测服务</b><br>'
-      +'· 电脑上打开本页:请先双击运行 <code>D:\\个人资料\\Claude\\MD\\启动经营分析更新服务_20260920_1625.bat</code>(保持窗口打开),再点此按钮。<br>'
-      +'· 手机/平板:检测与增量分析需在电脑上执行。点击下方按钮,钉钉会自动填好更新请求消息,选择收件人发送,即可在电脑钉钉收到提醒:<br>'
-      +'<a class="urgebtn" style="display:inline-block;margin-top:6px;text-decoration:none" href="dingtalk://dingtalkclient/action/sendmsg?corpId=ding27295497fa81748135c2f4657eb6378f&content='+encodeURIComponent('更新经营分析(手机端请求):请电脑端 Claude 检查资料更新并完成增量分析')+'">📱 在钉钉发起更新请求</a></div>';
+    const reqTxt='更新经营分析(手机端请求):请电脑端 Claude 检查资料更新并完成增量分析';
+    p.innerHTML='<div class="updbox err"><b>未连接电脑端检测服务(手机/平板端属正常现象)</b><br>'
+      +'检测与增量分析必须在电脑上执行(资料文件夹与钉钉数据都在电脑)。两种方式发起更新请求:<br>'
+      +'<b>方式一:</b>点击下方按钮,钉钉自动填好请求消息,选收件人发送:<br>'
+      +'<a class="urgebtn" style="display:inline-block;margin-top:6px;text-decoration:none" href="dingtalk://dingtalkclient/action/sendmsg?corpId=ding27295497fa81748135c2f4657eb6378f&content='+encodeURIComponent(reqTxt)+'">📱 钉钉发起更新请求</a> '
+      +'<button class="urgebtn" style="margin-top:6px" onclick="copyTxt()">📋 复制请求文案</button><br>'
+      +'<b>方式二:</b>电脑上打开本页,先双击运行 <code>D:\\个人资料\\Claude\\MD\\启动经营分析更新服务_20260920_1625.bat</code>(保持窗口打开),再点「数据更新」即可直接检测并生成任务。</div>';
     st.textContent='⚠️ 未连接检测服务(手机端可走钉钉请求)';
   });
+}
+function copyTxt(){
+  const t='更新经营分析(手机端请求):请电脑端 Claude 检查资料更新并完成增量分析';
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>alert('已复制请求文案,可粘贴到钉钉发送')).catch(()=>prompt('请长按复制:',t));}
+  else{prompt('请长按复制:',t);}
 }
 function copyCmd(){
   if(navigator.clipboard && navigator.clipboard.writeText){
@@ -1101,7 +1115,7 @@ function copyCmd(){
 // ---------- 每30分钟自动检查 ----------
 function autoCheck(){
   const last=document.getElementById('updLast');
-  fetch('http://127.0.0.1:8765/api/check',{cache:'no-store'})
+  fetchT('http://127.0.0.1:8765/api/check')
   .then(r=>{ if(!r.ok) throw new Error(); return r.json(); })
   .then(d=>{
     if(d.hasUpdate){
