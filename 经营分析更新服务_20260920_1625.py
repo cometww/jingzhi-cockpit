@@ -189,6 +189,29 @@ class H(BaseHTTPRequestHandler):
                             "message": "已生成待更新任务文件",
                             "taskFile": task,
                             "updates": ups})
+        elif self.path.startswith("/api/urge"):
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                body = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
+            except Exception:
+                body = {}
+            person = (body.get("person") or "").strip()
+            msg = (body.get("msg") or "").strip()
+            if not person or not msg:
+                self._json({"ok": False, "message": "缺少 person/msg 参数"})
+                return
+            if body.get("dry"):
+                self._json({"ok": True, "dry": True, "person": person, "msg": msg})
+                return
+            try:
+                p = subprocess.run(
+                    ["dws", "chat", "+dm", "--to", person, "--content", msg, "-y"],
+                    capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120)
+                self._json({"ok": True, "person": person,
+                            "sentAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            "detail": (p.stdout or "")[:300]})
+            except Exception as e:
+                self._json({"ok": False, "message": "发送失败: %s" % e})
         else:
             self._json({"ok": False, "message": "unknown endpoint"})
 
