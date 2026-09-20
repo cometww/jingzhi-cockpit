@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>公司经营驾驶舱</title>
+<style>
+:root{--dark:#1f3864;--blue:#2e74b5;--lblue:#deeaf6;--green:#2e7d32;--lgreen:#e9f4e9;
+--red:#c0392b;--lred:#fce8e6;--orange:#c56a0a;--lorange:#fdf2e3;--gray:#595959;--lgray:#f2f2f2;--line:#cbd5e0;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:#f5f7fa;color:#222;line-height:1.65;font-size:14px}
+header{background:linear-gradient(135deg,#1f3864,#2e74b5);color:#fff;padding:26px 40px 18px}
+header h1{font-size:24px;margin-bottom:6px}
+header .sub{font-size:13px;color:#cfe0f2}
+.kb{background:rgba(255,255,255,.12);border-radius:8px;padding:12px 16px;margin-top:14px;font-size:12.5px;color:#e8f0fa}
+.kb b{color:#ffd98a}
+.tabs{position:sticky;top:0;z-index:50;display:flex;gap:6px;background:#fff;padding:10px 40px;border-bottom:2px solid var(--lblue);box-shadow:0 2px 6px rgba(0,0,0,.06);flex-wrap:wrap}
+.tab{padding:8px 22px;border-radius:6px 6px 0 0;cursor:pointer;border:1px solid transparent;font-size:15px;font-weight:600;color:var(--gray);background:var(--lgray)}
+.tab:hover{background:var(--lblue);color:var(--dark)}
+.tab.active{background:var(--dark);color:#fff}
+.wrap{padding:20px 40px 60px;max-width:1400px;margin:0 auto}
+.sec{margin-top:22px}
+.sec>h2{font-size:17px;color:var(--dark);border-left:5px solid var(--blue);padding-left:10px;margin-bottom:12px}
+.sec>h2 .tag{font-size:11px;font-weight:normal;color:#fff;border-radius:4px;padding:2px 8px;margin-left:8px;vertical-align:2px}
+.tag.fact{background:var(--blue)}.tag.judge{background:var(--orange)}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card h3{font-size:15px;color:var(--dark);margin-bottom:10px}
+.pdfbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pdfbar a{display:inline-block;background:var(--lblue);color:var(--dark);padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:600;border:1px solid var(--blue)}
+.pdfbar a:hover{background:var(--blue);color:#fff}
+.pdfbar .cutoff{color:var(--gray);font-size:12.5px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+th{background:var(--dark);color:#fff;padding:7px 8px;text-align:center;font-weight:600;white-space:nowrap}
+td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+tr:nth-child(even) td{background:#fafbfd}
+td.l{text-align:left;font-weight:600;color:var(--dark);white-space:nowrap}
+.neg{color:var(--red);font-weight:600}
+.pos{color:var(--green);font-weight:600}
+.flag{background:var(--lred);color:var(--red);border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700;margin-left:6px}
+.flag.warn{background:var(--lorange);color:var(--orange)}
+.flag.ok{background:var(--lgreen);color:var(--green)}
+.note{font-size:11.5px;color:var(--gray);margin-top:4px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.kpi{background:#fff;border-radius:10px;padding:16px 18px;border:1px solid var(--line);border-top:4px solid var(--blue)}
+.kpi .k{font-size:12.5px;color:var(--gray)}
+.kpi .v{font-size:26px;font-weight:700;color:var(--dark);margin:4px 0 2px}
+.kpi .d{font-size:12px;color:var(--gray)}
+.kpi.red{border-top-color:var(--red)}.kpi.red .v{color:var(--red)}
+.kpi.green{border-top-color:var(--green)}.kpi.green .v{color:var(--green)}
+.kpi.orange{border-top-color:var(--orange)}.kpi.orange .v{color:var(--orange)}
+.diag{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.diag{grid-template-columns:1fr}}
+.diag .facts li,.diag .judge li{margin:6px 0 6px 18px}
+.diag .facts li::marker{color:var(--blue)}
+.diag .judge li::marker{color:var(--orange)}
+.actions{margin-top:10px}
+.actions .act{display:flex;gap:10px;align-items:flex-start;background:var(--lgreen);border-radius:8px;padding:9px 12px;margin-bottom:8px}
+.actions .pri{flex-shrink:0;background:var(--red);color:#fff;border-radius:5px;font-size:11px;font-weight:700;padding:2px 8px;margin-top:2px}
+.actions .pri.p1{background:var(--orange)}.actions .pri.p2{background:var(--blue)}
+.actions .body b{color:var(--dark)}
+.lvl3{margin-top:8px}
+.lvl3 details{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;background:#fff}
+.lvl3 summary{cursor:pointer;padding:10px 14px;font-weight:700;color:var(--dark);background:var(--lgray);border-radius:8px;list-style:none}
+.lvl3 summary::before{content:"▸ ";color:var(--blue)}
+.lvl3 details[open] summary::before{content:"▾ "}
+.lvl3 .inner{padding:12px 16px}
+ul.clean{list-style:none}
+ul.clean li{padding:5px 0 5px 20px;position:relative}
+ul.clean li::before{content:"•";color:var(--blue);position:absolute;left:6px}
+footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:var(--gray);font-size:12px}
+.src{font-size:11.5px;color:var(--gray)}
+.src b{color:var(--dark)}
+.updbar{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+#btnCheck{background:#ffd98a;color:#1f3864;border:none;border-radius:8px;padding:10px 22px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+#btnCheck:hover{background:#ffe9b8}
+#btnCheck:active{transform:translateY(1px)}
+.updstatus{font-size:13px;color:#cfe0f2}
+.updbox{border-radius:8px;padding:12px 16px;margin-top:10px;font-size:13px;line-height:1.7}
+.updbox.warn{background:var(--lorange);border:1px solid var(--orange);color:#5c3a08}
+.updbox.ok{background:var(--lgreen);border:1px solid var(--green);color:#1e4d23}
+.updbox.err{background:var(--lred);border:1px solid var(--red);color:#7c1f15}
+.updbox ul{margin:6px 0 6px 20px}
+.updbox code{background:rgba(255,255,255,.75);padding:2px 8px;border-radius:4px;font-family:Consolas,monospace}
+.updbox button{margin-left:8px;background:var(--dark);color:#fff;border:none;border-radius:5px;padding:3px 12px;cursor:pointer;font-family:inherit;font-size:12.5px}
+.updbox .hint{margin-top:8px;font-size:12.5px}
+.updbox.last{background:var(--lgray);border:1px solid var(--line);color:var(--gray)}
+.wb-role{display:inline-block;background:#1f3864;color:#fff;font-size:12px;font-weight:700;border-radius:5px;padding:2px 10px;margin-left:6px;vertical-align:2px}
+.wb-time{display:inline-block;background:#fff;color:#333;font-size:12px;font-weight:600;border:1px solid #9aa5b5;border-radius:5px;padding:2px 10px;margin-left:6px;vertical-align:2px}
+.wb-w{display:inline-block;background:#e8eef7;color:#1f3864;font-size:12px;font-weight:700;border:1px solid #b9cbe4;border-radius:5px;padding:2px 10px;margin-left:6px;vertical-align:2px}
+.wb-w.new{background:#2e7d32;color:#fff;border-color:#2e7d32}
+.wb-key{background:#fdf2e3;border-left:4px solid #c56a0a;border-radius:0 6px 6px 0;padding:7px 12px;margin:8px 0 4px;font-size:13px}
+.wb-key b{color:#c56a0a}
+.chartbox{margin:16px 0 22px}
+.charttitle{font-weight:700;color:var(--dark);font-size:13.5px;margin-bottom:6px}
+.chartgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 26px}
+@media(max-width:1100px){.chartgrid{grid-template-columns:1fr}}
+/* ---------- 移动端 / 平板 / 鸿蒙适配 ---------- */
+@media(max-width:768px){
+  body{font-size:13px;-webkit-text-size-adjust:100%}
+  header{padding:16px 12px 12px}
+  header h1{font-size:19px}
+  header .sub{font-size:12px}
+  .kb{font-size:11.5px;padding:10px 12px;line-height:1.6}
+  .tabs{padding:8px 8px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:5px}
+  .tab{padding:9px 15px;font-size:14px;white-space:nowrap;flex-shrink:0}
+  .wrap{padding:12px 10px 50px}
+  .grid3{grid-template-columns:1fr;gap:10px}
+  .kpi{padding:12px 14px}
+  .kpi .v{font-size:22px}
+  .card{padding:12px 10px;border-radius:8px}
+  .sec{margin-top:16px}
+  .sec>h2{font-size:15.5px}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .diag{grid-template-columns:1fr}
+  .chartgrid{grid-template-columns:1fr}
+  .updbar{flex-direction:column;align-items:stretch;gap:8px}
+  #btnCheck{width:100%;min-height:44px;font-size:15px}
+  .updbox{font-size:12.5px}
+  .pdfbar{flex-direction:column;align-items:stretch;gap:8px}
+  .pdfbar a{text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center}
+  .actions .act{flex-direction:column;gap:4px}
+  footer{font-size:11px;padding:10px 0}
+}
+@media(min-width:769px) and (max-width:1100px){
+  .grid3{grid-template-columns:repeat(2,1fr)}
+  .tabs{padding:8px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{display:block;overflow-x:auto;white-space:nowrap}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>公司经营驾驶舱</h1>
+  <div class="sub">资深经营分析视角 · 三级维度(公司整体 → 事业部 → 板块)· 按月份切换 · 营销/主题/管理层周报全覆盖 · 数据截止至各月报告发布日</div>
+  <div class="kb">
+    <b>指标口径统一说明</b>(依据各月《经营报告》总览表,金额单位:万元):
+    ① <b>收入/管理利润/营业利润</b>均为"交付口径",营业利润含产销差异等调整项,与"合计1"行对应;② <b>累计同比</b>=与2025年同期累计对比;③ <b>环比</b>=与上月对比;④ <b>全年完成率</b>=累计收入÷全年目标(全年目标约11.5亿,由8月报告"5.06亿完成44%"推算;3月/5月报告未披露完成率,标注"未披露",不臆造);⑤ 蓝沃数科/技术&新项目/总部为费用中心或尚无收入;⑥ 各月PPT未披露的指标一律标"未披露"。<b>蓝色=数据事实,橙色=分析判断。</b>
+  </div>
+  <div class="updbar">
+    <button id="btnCheck" onclick="checkUpdate()">🔄 数据更新</button>
+    <span id="updStatus" class="updstatus">点击检查全部数据源:月度经营资料文件夹 + 其他关键主题 + 管理层最新周报</span>
+    <span id="updLast" class="updstatus"></span>
+  </div>
+  <div id="updPanel"></div>
+  <div style="font-size:12px;color:#9fb6d4;margin-top:8px">⏱ 自动检查:每 30 分钟一次(页面打开时生效),检查文件夹资料与每人最新周报是否有变化,有变化会在上方提示。</div>
+</header>
+<div class="tabs" id="tabs"></div>
+<div class="wrap" id="content"></div>
+<footer id="foot"></footer>
+
+<script>
+const PDF_BASE='file:///D:/'+encodeURI('上海精智/2026/AI管理/公司月度经营/');
+const MONTHS=[
+{id:'m8',label:'8月',pdf:'03 2026年8月经营报告@20260916.pdf',pub:'2026-09-16',default:true,
+ company:{rev:'9,838',mgn:'-767',op:'-636',cumRev:'50,694',cumMgn:'-8,947',momRev:'-119',momMgn:'-1,037',yoyRev:'15,262',yoyMgn:'-4,503',rate:'44%',rateNote:'全年目标约11.5亿,完成率44%,落后时间进度(8/12≈67%)23个百分点'},
+ bus:[
+ {n:'工艺事业部',rev:'1,657',mgn:'506',cumRev:'10,626',cumMgn:'2,955',mom:'13',yoy:'2,077',flag:'',note:'利润压舱石:武汉工艺(累计管理利润2,330万)撑起大局;康桥工厂累计同比-444万,为主要拖累'},
+ {n:'供应链事业部',rev:'1,462',mgn:'-245',cumRev:'7,973',cumMgn:'-1,921',mom:'224',yoy:'2,371',flag:'warn',note:'收入同比+2,371万,但利润同比-1,471万,增收不增利;六安/淮安工厂深度亏损(累计-838/-503万)'},
+ {n:'智能事业部',rev:'2,527',mgn:'215',cumRev:'8,787',cumMgn:'9',mom:'-123',yoy:'5,925',flag:'warn',note:'累计完成率48%,剔除专项3,458万后仅29%;嘉定/上海车间已放量,康桥车间累计亏损24万'},
+ {n:'通讯5G',rev:'2,261',mgn:'-142',cumRev:'9,884',cumMgn:'100',mom:'-375',yoy:'3,235',flag:'',note:'累计完成率33%,剔除专项4,082万后仅19%,为各事业部最低;8月管理利润转负(-142万)'},
+ {n:'利敬&三远',rev:'571',mgn:'7',cumRev:'4,406',cumMgn:'391',mom:'-6',yoy:'543',flag:'ok',note:'稳定盈利单元,累计管理利润391万,同比+98万'},
+ {n:'蓝沃数科',rev:'19',mgn:'-344',cumRev:'167',cumMgn:'-2,150',flag:'',note:'累计完成率18%,累计亏损2,150万,收入变现路径未通'},
+ {n:'总部及其他',rev:'-',mgn:'-492',cumRev:'-',cumMgn:'-6,310',flag:'warn',note:'含IPO费用(港股),8月累计2,210万,持续推高费用基数'}],
+ plants:[
+ ['工艺','康桥工厂',687,179,114,'环比+114万,交付恢复;累计同比仍-444万'],
+ ['工艺','嘉定工厂',93,10,37,''],
+ ['工艺','平湖工厂',14,-1,-1,''],
+ ['工艺','上海工厂',793,187,150,'环比+150万,利润翻倍,主力工厂之一'],
+ ['工艺','武汉工艺',808,332,-151,'环比回落,但累计管理利润2,330万,全公司利润第一'],
+ ['工艺','长春工厂',56,-1,14,'利润环比转负'],
+ ['供应链','川沙工厂',650,-72,133,'收入环比+133万,亏损收窄至-72万;9-12月需完成1,500万降本(风险大)'],
+ ['供应链','六安工厂',412,-78,181,'收入爬坡中,累计亏损838万'],
+ ['供应链','淮安工厂',43,-108,-93,'累计亏损503万,产能爬坡不及预期'],
+ ['供应链','武汉工厂',357,18,2,''],
+ ['智能','康桥车间',757,287,-255,'收入环比-255万,利润大幅转正+287万'],
+ ['智能','嘉定车间',1,444,-42,-142,'7月冲高后回落,交付节奏波动'],
+ ['智能','上海工厂',2,201,245,-397,'收入环比-397万,仍为智能第一大板块'],
+ ['智能','武汉车间',326,71,286,'环比大幅改善'],
+ ['智能','重庆车间','-',-80,-12,''],
+ ['5G','亿泊工厂',1,124,68,45,'5G基本盘,累计利润713万'],
+ ['5G','南昌工厂',216,49,106,''],
+ ['其他','利敬',109,15,15,''],
+ ['其他','三远',462,-8,-21,'利润转负,累计249万']],
+ risks:[
+ '收入:8月累计5.06亿,完成全年目标44%;智能29%/5G 19%/蓝沃18%/A项目0%(剔除专项后)',
+ '8+4滚动预测:管理利润亏损1.40亿(较预算增亏3,007万),含产销差异后亏1.57亿;剔除IPO费用7,928万后亏7,926万,增亏点集中在供应链、智能、5G',
+ '客户仓未定价:19,776万(已预收3,387万),含25年830万,需尽快定价开票回款',
+ '现金流:贷款5.53亿,较年初+3.37亿;9月压缩后付款计划7,843万,勉强以收定支',
+ '逾期应收:2,343万(环比+80万);呆滞存货:原材料945万+库存商品669万;发出商品1,538万(超3个月663万)',
+ '半年报函证:大多数客户无法相符回函,依靠替代程序,审计调整风险存在',
+ '采购降本&VAVE:目标1,845万,1-8月实际518万(28%);商务降价目标1,195万,实际489万',
+ '政府补贴:全年预计507万,低于目标1,000万;川沙9-12月1,500万降本风险大',
+ '物流单据不及时:研究院、芜湖工厂、东莞工厂制单不及时'],
+ mkt:{pdf:'9月经营分析会报告/02 营销管理中心工作汇报@20260916.pdf',sub:'9月经营分析会报告(最新一期)',
+  facts:['截至9/11集团累计订单6.24亿,全年目标完成46.60%,同比+46.98%(数据事实)','9月末预估累计营收6.29亿,同比+55.26%,环比+18.63%;Q3营收预测31,383万;7+5目标105,700万(数据事实)','逾期账款2,343.6万,较6月+81.4万(+3.6%);智能逾期741.77万=项目问题215.11万+客户原因226.66万+质保109.91万+阶段性验收190.07万(数据事实)','Q3回款:6月底应收25,930.5万,Q3测算回款19,748.9万,缺口6,181.6万(数据事实)','板块订单完成率:工艺57.57%、智能47.97%(军令状2.1亿,差12,405万)、塑胶71.20%、供应链42.08%(六安22.69%/淮安7.21%)、5G东莞36.69%、南昌74.30%、利敬85.43%、三远62.26%(数据事实)','工艺发出商品1,135.83万,较7月-109.18万(-8.77%)(数据事实)'],
+  prob:['订单完成率46.60%,按时间进度(9/12≈75%)落后28个百分点;5G东莞36.69%、供应链42.08%是主要拖累(数据事实+分析判断)','Q3回款缺口6,181.6万;智能逾期中"项目问题+客户原因"合计441.77万,反映交付质量与客户流程双重障碍(分析判断)','六安22.69%/淮安7.21%的订单完成率与产能爬坡互为因果,订单导入决定两厂命运(分析判断)'],
+  advice:['【P0】Q3回款19,748.9万按周拆解,缺口6,181.6万逐户列补救方案 — 责任:营销管理中心','【P0】5G东莞在手订单(已下单+已中标未下单)转化与压铸产能爬坡联动,盯住36.69%完成率 — 责任:营销管理中心/5G事业部','【P1】智能军令状2.1亿、缺口12,405万的Q4冲刺方案 — 责任:智能事业部/营销管理中心']},
+ diag:{
+  company:{
+   facts:['8月收入9,838万,环比-119万;累计完成率44%落后时间进度23个百分点(数据事实)','管理利润当月-767万,8+4预测全年亏损1.40亿,较预算增亏3,007万(数据事实)','贷款5.53亿较年初增加3.37亿,9月付款计划压缩至7,843万(数据事实)'],
+   judge:['收入结构依赖专项(智能3,458万/5G 4,082万),常规业务造血不足是核心症结(分析判断)','IPO费用7,928万+费用预算累计追加1,117万,费用刚性叠加收入不达,利润雪上加霜(分析判断)','资金已进入"以收定支"紧平衡,授信与回款任一环节波动都会放大经营风险(分析判断)'],
+   top:'本月最紧迫的事:未定价客户仓19,776万逐笔定价开票回款 + 9月7,843万付款计划严格执行 + 8+4亏损风险清单逐项关闭',
+   actions:[
+    {pri:'P0',a:'定价开票攻坚:客户仓19,776万按板块排周计划逐笔定价,9-12月转化为回款',owner:'销售部(含事业部)'},
+    {pri:'P0',a:'降本专项:川沙1,500万(9-12月)、采购降本1,845万目标缺口1,327万逐项落实',owner:'供应链事业部/采购部'},
+    {pri:'P0',a:'资金纪律:严格执行9月7,843万付款计划,追加预算逐笔审批',owner:'财务部'},
+    {pri:'P1',a:'收入确认前置:函证替代程序单据(合同/送货单/回款)在开票前审核齐套',owner:'销售部/财务部'},
+    {pri:'P1',a:'订单拉动:华为PO拉动、湘华/舜富价格谈判落地,补5G完成率缺口',owner:'5G事业部/销售部'}]},
+  bus:[
+   {n:'通讯5G',f:['累计完成率33%,剔除专项后仅19%,全公司最低(数据事实)','8月管理利润-142万,连续两月回落(6月+391.5万→7月+649万→8月-142万)(数据事实)'],j:['专项4,082万掩盖了常规业务萎缩(分析判断)','东莞压铸产能爬坡(达成率77%)与湘华订单拉动不足互相拖累(分析判断)'],act:[{pri:'P0',a:'华为PO拉动2万余件存量订单,湘华价格谈判9/21定案',owner:'5G事业部/刘超'},{pri:'P1',a:'压铸人力缺口补充+3台机假期保产,爬坡至500件/天',owner:'郭寒毅/白瑞兵'}]},
+   {n:'智能事业部',f:['剔除专项后完成率29%(数据事实)','嘉定车间7月+704万→8月-42万,交付节奏大幅波动(数据事实)'],j:['专项收入占4成,常规订单承接能力未建立(分析判断)'],act:[{pri:'P0',a:'明确专项与常规收入分列考核,锁定9-12月常规订单',owner:'智能事业部'}]},
+   {n:'供应链事业部',f:['六安/淮安工厂累计亏损838万/503万(数据事实)','川沙8月亏损收窄至-72万(数据事实)'],j:['产能利用率不足是亏损主因,订单导入决定全年盈亏(分析判断)'],act:[{pri:'P0',a:'6+6订单导入计划按周复盘,未达标工厂启动产能调整',owner:'供应链事业部'}]},
+   {n:'蓝沃数科',f:['累计收入167万,累计亏损2,150万(数据事实)'],j:['当前商业模式造血能力存疑,需止损评估(分析判断)'],act:[{pri:'P1',a:'按业务线做9月止损/转型评估,明确变现路径',owner:'蓝沃数科'}]}],
+  plant:[
+   {n:'六安/淮安工厂',t:'供应链亏损重灾区',d:'两厂累计管理利润-838/-503万;淮安工厂投资已冻结(7月调减7,467万),产能爬坡与订单双缺。建议:订单导入与产能匹配做联合测算,明确保产/收缩方案。'},
+   {n:'康桥工厂(工艺)',t:'利润拖累项',d:'收入恢复(8月687万)但累计同比仍-444万;建议:重点客户交付恢复后核查毛利结构,避免"有量无利"。'},
+   {n:'亿泊工厂',t:'5G基本盘',d:'8月1,124万收入、累计利润713万,是5G唯一稳定盈利板块;力邦年降已开票607万。建议:保持交付节奏,关注力邦回款。'}]},
+ risks2:[]},
+
+{id:'m7',label:'7月',pdf:'02 2026年7月经营报告@20260819.pdf',pub:'2026-08-19',
+ company:{rev:'9,957',mgn:'270',op:'-225',cumRev:'40,856',cumMgn:'-8,179',momRev:'-2,213',momMgn:'-762',yoyRev:'10,124',yoyMgn:'-4,292',rate:'35%',rateNote:'全年完成率35%,较6月+8个百分点'},
+ bus:[
+ {n:'工艺事业部',rev:'1,644',mgn:'452',cumRev:'8,970',cumMgn:'2,449',mom:'-385',yoy:'1,555',flag:'',note:'收入环比-385万(6月交付高峰后回落),累计仍为盈利主力'},
+ {n:'供应链事业部',rev:'1,238',mgn:'-144',cumRev:'6,511',cumMgn:'-1,676',mom:'140',yoy:'1,592',flag:'warn',note:'收入同比增长,但累计亏损1,676万,同比增亏1,337万'},
+ {n:'智能事业部',rev:'2,650',mgn:'647',cumRev:'6,260',cumMgn:'-206',mom:'-151',yoy:'3,823',flag:'',note:'完成率34%,剔除专项3,458万后仅15%;当月利润+647万,累计接近盈亏平衡'},
+ {n:'通讯5G',rev:'2,636',mgn:'649',cumRev:'7,623',cumMgn:'242',mom:'-1,195',yoy:'1,646',flag:'warn',note:'完成率25%,剔除专项4,212万后仅11.3%;6月集中交付后大幅回落'},
+ {n:'利敬&三远',rev:'577',mgn:'53',cumRev:'3,835',cumMgn:'389',mom:'-116',yoy:'558',flag:'ok',note:''},
+ {n:'蓝沃数科',rev:'14',mgn:'-289',cumRev:'148',cumMgn:'-1,804',flag:'',note:'累计完成率16%'},
+ {n:'总部及其他',rev:'-',mgn:'-782',cumRev:'-',cumMgn:'-5,825',flag:'warn',note:'IPO费用按月约150万持续计入'}],
+ plants:[
+ ['工艺','康桥工厂',573,115,-369,'6月942万高峰后回落'],
+ ['工艺','嘉定工厂',56,-17,-265,''],
+ ['工艺','平湖工厂',15,-1,-10,''],
+ ['工艺','上海工厂',644,97,-645,'收入环比-645万,主要交付波动'],
+ ['工艺','武汉工艺',958,369,279,'利润环比+279万,全年最强板块'],
+ ['工艺','长春工厂',42,3,-19,''],
+ ['供应链','川沙工厂',516,-62,-93,'亏损环比扩大'],
+ ['供应链','六安工厂',232,-106,58,'收入爬坡,亏损仍深'],
+ ['供应链','淮安工厂',136,14,123,'利润转正'],
+ ['供应链','武汉工厂',355,22,52,''],
+ ['智能','康桥车间',1,012,86,550,'收入翻倍'],
+ ['智能','嘉定车间',1,586,704,-128,'放量+盈利双高'],
+ ['智能','上海工厂',2,598,790,421,'智能最大盈利板块'],
+ ['智能','武汉车间',40,-35,-158,''],
+ ['智能','重庆车间',12,-84,-415,'收入骤降'],
+ ['5G','亿泊工厂',1,079,46,19,''],
+ ['5G','南昌工厂',111,-19,-431,'收入大幅回落'],
+ ['其他','利敬',94,0,-126,''],
+ ['其他','三远',483,53,-9,'']],
+ risks:[
+ '收入:7月9,957万,累计4.08亿完成35%;智能15%/5G 11.3%(剔除专项后)',
+ '客户仓未定价:19,565万(25年894万),亿泊力邦1,983万待定价',
+ '费用预算追加:累计1,282万(7月+251万,主要中介服务费)',
+ '投资调整:调减4,672万——取消淮安实轴1,434万、冻结淮安自建7,467万(2/3号厂房);新增5G增量投资4,196万待上会',
+ '现金流:贷款5.22亿(较年初+3.06亿),9月底预计提款至5.9亿;半年报披露后提款难度增大',
+ '逾期应收:2,262万(环比+206万);Q3回款计划20,111万(7月实际3,792万,坏差5,819.5万)',
+ '采购降本&VAVE:432万,高于客户年降377万(首次转正),但工艺仍低于客户降本',
+ '研发未立项成本:EMB 105万、中央气源152万',
+ '呆滞存货:1,976万;发出商品1,998万(超3个月1,001万)'],
+ mkt:{pdf:'20260821经营分析会材料/01 营销管理中心工作汇报@20260819.pdf',sub:'20260821经营分析会材料',
+  facts:['截至8/15集团累计订单5.45亿,全年目标完成40.71%,同比+46.57%(数据事实)','通讯5G在手订单1.55亿:已下单4,392.8万+已中标未下单11,119.61万;5G订单金额同比增长153.07%(数据事实)'],
+  prob:['订单完成率40.71%,落后时间进度(8/12≈67%)26个百分点(数据事实)','已中标未下单规模连续两期维持1.1亿+,转化瓶颈在客户流程侧(分析判断)'],
+  advice:['【P0】未下单订单的客户侧流程跟踪(合同/中标通知/排产指令)周报 — 责任:营销管理中心','【P1】9-10月淮安208512/206541/206542增量,联合事业部提前布局产能与交付 — 责任:供应链事业部']},
+ diag:{
+  company:{
+   facts:['7月收入9,957万,环比-2,213万(-18%);累计完成率35%(数据事实)','当月管理利润+270万,连续第2个月为正(数据事实)','贷款5.22亿,9月底将提款至5.9亿,半年报披露后提款难度加大(数据事实)'],
+   judge:['6月放量(12,170万)不可持续,7月回落暴露常规订单不足的真相(分析判断)','投资端主动冻结淮安自建项目,是现金保护的正确动作,但5G新增4,196万投资与收入完成率11.3%形成矛盾,需上会严审(分析判断)'],
+   top:'本月最紧迫的事:Q3回款计划20,111万按月兑现(7月仅完成3,792万)+ 5G增量投资4,196万上会评审',
+   actions:[
+    {pri:'P0',a:'回款攻坚:Q3回款计划按月拆解到客户/订单,坏差5,819.5万逐户打开原因',owner:'销售部(含事业部)'},
+    {pri:'P0',a:'资金窗口:赶在9月底前提款窗口,同步洽谈金租等替代渠道(利率高100%)',owner:'财务部'},
+    {pri:'P1',a:'5G投资评审:4,196万增量投资与11.3%常规完成率联动评审',owner:'投资评审/5G事业部'},
+    {pri:'P1',a:'研发立项闭环:EMB(105万)、中央气源(152万)补立项或终止',owner:'研发中心'}]},
+  bus:[
+   {n:'通讯5G',f:['剔除专项后完成率11.3%,全公司最低(数据事实)','7月收入2,636万,环比-1,195万(数据事实)'],j:['专项4,212万是5G收入主体,常规业务实际萎缩(分析判断)'],act:[{pri:'P0',a:'东莞工厂订单拉动专项:华为PO/湘华/舜富三条线周跟踪',owner:'5G事业部'}]},
+   {n:'智能事业部',f:['嘉定车间+上海工厂合计利润1,494万,创年内单月新高(数据事实)'],j:['放量兑现验证产线能力,但8月能否延续是关键(分析判断)'],act:[{pri:'P1',a:'锁定放量订单的8-12月交付计划',owner:'智能事业部'}]},
+   {n:'供应链事业部',f:['淮安工厂利润+14万,年内首次月度转正(数据事实)','六安工厂累计-760万(数据事实)'],j:['淮安转正是积极信号,但六安仍深亏,两厂分化(分析判断)'],act:[{pri:'P1',a:'六安订单导入与亏损限期整改方案',owner:'供应链事业部'}]}],
+  plant:[
+   {n:'嘉定车间(智能)',t:'本月亮点',d:'1,586万收入、+704万利润,验证大客户订单放量能力;建议固化排产与供应链配套,防止8月回落。'},
+   {n:'重庆车间(智能)',t:'异动提示',d:'收入12万,环比-415万;需确认是订单断档还是交付延迟,并评估下半年订单储备。'},
+   {n:'淮安工厂(供应链)',t:'改善信号',d:'利润年内首次转正(+14万),与投资冻结形成"收缩-止血"组合,建议评估最小产能模型。'}]},
+ risks2:[]},
+
+{id:'m6',label:'6月',pdf:'02 2026年6月经营报告@20260720.pdf',pub:'2026-07-21',
+ company:{rev:'12,169.5',mgn:'1,031.9',op:'369.6',cumRev:'30,899.2',cumMgn:'-8,530.2',momRev:'7,151',momMgn:'2,517',yoyRev:'4,631.5',yoyMgn:'-5,335.5',rate:'27%',rateNote:'全年完成率27%,上半年累计3.08亿'},
+ bus:[
+ {n:'工艺事业部',rev:'2,028.4',mgn:'779.9',cumRev:'7,325.9',cumMgn:'1,995.7',mom:'699',yoy:'1,061.2',flag:'ok',note:'6月交付高峰,收入环比+699万,利润创年内单月新高'},
+ {n:'供应链事业部',rev:'1,097.7',mgn:'-218.9',cumRev:'5,273.4',cumMgn:'-1,531.7',mom:'127.7',yoy:'1,025.7',flag:'warn',note:'收入恢复但亏损依旧,累计同比增亏1,259.6万'},
+ {n:'智能事业部',rev:'2,801.4',mgn:'826.4',cumRev:'3,610.1',cumMgn:'-851.5',mom:'2,490.5',yoy:'1,554.3',flag:'',note:'单月放量(嘉定1,714万/上海2,176万),完成率20%→6月大幅改善,但累计仍亏损'},
+ {n:'通讯5G',rev:'3,830.7',mgn:'391.5',cumRev:'4,986.4',cumMgn:'-407.2',mom:'3,207.7',yoy:'-117.1',flag:'warn',note:'收入环比+3,208万(集中交付),但累计完成率仅17%'},
+ {n:'利敬&三远',rev:'692.2',mgn:'104',cumRev:'3,258.6',cumMgn:'335.8',mom:'45.2',yoy:'467.4',flag:'ok',note:''},
+ {n:'蓝沃数科',rev:'111.3',mgn:'-180.1',cumRev:'134',cumMgn:'-1,514.1',flag:'',note:'累计完成率14%,当月收入111.3万为年内最高'},
+ {n:'总部及其他',rev:'-',mgn:'-511.4',cumRev:'-',cumMgn:'-5,123.9',flag:'warn',note:''}],
+ plants:[
+ ['工艺','康桥工厂',942.1,404.2,564.9,'利润环比+343万'],
+ ['工艺','嘉定工厂',321.4,131.3,207.7,'利润转正'],
+ ['工艺','平湖工厂',24.7,-1.6,21.7,''],
+ ['工艺','上海工厂',1,288.2,533.9,794.2,'利润环比+502万,强劲'],
+ ['工艺','武汉工艺',679.6,242.6,-99.5,''],
+ ['工艺','长春工厂',60.6,16.7,4.3,''],
+ ['供应链','川沙工厂',608.9,-72.9,5.2,'亏损大幅收窄'],
+ ['供应链','六安工厂',173.2,-105.9,32.3,''],
+ ['供应链','淮安工厂',13.1,-74.8,-7.4,''],
+ ['供应链','武汉工厂',302.5,42.9,97.7,''],
+ ['智能','康桥车间',462.1,9.7,233.7,'利润转正'],
+ ['智能','嘉定车间',1,714.1,717,1,699.6,'放量!收入环比+1,700万,利润+717万'],
+ ['智能','上海工厂',2,176.2,726.7,1,933.3,'放量!收入环比+1,933万'],
+ ['智能','武汉车间',198.2,6.9,130.1,''],
+ ['智能','重庆车间',427,114.2,427,'收入首次放量'],
+ ['5G','亿泊工厂',1,059.5,94.7,-28.8,''],
+ ['5G','南昌工厂',541.1,129.3,513.9,'收入环比+514万'],
+ ['其他','利敬',219.7,73.7,98.7,''],
+ ['其他','三远',472.5,30.3,-49.2,'']],
+ risks:[
+ '收入:6月单月1.22亿,累计3.08亿仅完成全年27%;智能20%/5G 17%/蓝沃14%/A项目0%',
+ '客户仓未定价:896万(25年部分)',
+ '费用预算追加:累计1,042万;投资预算追加:累计5,883万,较4+8预测全年付款+1,653.4万',
+ '现金流:Q3测算收1.41亿、付3.48亿,缺口2.23亿,已超可提款1.59亿,需扩大授信;Q4缺口预计0.5-1亿',
+ '逾期应收:2,468万(环比-917万),交付质量影响回款',
+ '采购降本&VAVE:356万,完成全年目标19.2%;工艺客户降本209万VS采购降本70万(倒挂)',
+ '研发未立项:EMB已发生89.8万、中央气源119.7万',
+ '物流单据:康桥/川沙/六安/研究院制单不及时'],
+ mkt:{pdf:'2026年7月月度经营分析会材料/01 营销管理中心工作汇报（包含逾期应收）@20260720.pdf',sub:'2026年7月月度经营分析会材料',
+  facts:['截至7/15集团累计订单4.88亿,全年目标完成37.59%,同比+49.85%(数据事实)','通讯5G在手订单1.52亿:已下单4,166.5万+已中标未下单11,043万(数据事实)','7月底预估累计营收3.63亿,同比+18.33%(数据事实,来自会议摘要)','逾期应收2,468万;大额逾期:纳铁福、皮尔博格、力邦(验收滞后、价格协议未签)(数据事实)'],
+  prob:['订单完成率37.59%低于时间进度(7/12≈58%),订单→交付→营收转化链偏慢(分析判断)','已中标未下单11,043万是最大确定性增量,转化速度决定全年(分析判断)'],
+  advice:['【P0】已中标未下单11,043万逐项排转化计划(客户流程/内部产能双线) — 责任:营销管理中心','【P0】纳铁福/皮尔博格/力邦专项谈判:验收与价格协议先行 — 责任:营销管理中心']},
+ diag:{
+  company:{
+   facts:['6月收入12,169.5万,环比+7,151万(+142%),年内最强单月(数据事实)','当月管理利润+1,031.9万,年内首次转正(数据事实)','Q3资金缺口2.23亿,已超可提款额度1.59亿(数据事实)'],
+   judge:['放量集中在智能嘉定/上海车间与5G集中交付,本质是订单集中交付而非均衡增长,7月回落风险大(分析判断)','资金缺口是硬约束:收1.41亿对付3.48亿,若不扩大授信,9月将无米下锅(分析判断)'],
+   top:'本月最紧迫的事:扩大授信(缺口0.64亿+)与Q4缺口预筹(0.5-1亿)+ 6月放量订单的持续导入',
+   actions:[
+    {pri:'P0',a:'授信扩额:缺口2.23亿已超可提款1.59亿,立即启动增量授信谈判',owner:'财务部'},
+    {pri:'P0',a:'订单连续性:放量板块(智能/5G)锁定7-9月排产订单,防止断崖',owner:'智能/5G事业部'},
+    {pri:'P1',a:'研发立项:EMB(89.8万)+中央气源(119.7万)补立项或终止',owner:'研发中心'},
+    {pri:'P1',a:'工艺降本倒挂整改:客户降本209万已传导,采购端70万需追平',owner:'采购部/工艺事业部'}]},
+  bus:[
+   {n:'智能事业部',f:['嘉定车间收入环比+1,699.6万、上海车间+1,933.3万(数据事实)','当月管理利润+826.4万,5月还是-307.4万(数据事实)'],j:['大客户放量兑现,是年内最重要的正面转折之一(分析判断)'],act:[{pri:'P0',a:'放量客户的产能与交付保障计划,防交付质量反噬回款',owner:'智能事业部'}]},
+   {n:'通讯5G',f:['收入环比+3,207.7万,但累计完成率仍仅17%(数据事实)'],j:['集中交付改善现金流,不改全年缺口(分析判断)'],act:[{pri:'P0',a:'华为/中兴后续订单导入节奏明确到月',owner:'5G事业部'}]},
+   {n:'供应链事业部',f:['川沙亏损收窄至-72.9万(数据事实)'],j:['降本措施初步见效(分析判断)'],act:[{pri:'P1',a:'川沙模式复制到六安/淮安',owner:'供应链事业部'}]}],
+  plant:[
+   {n:'嘉定车间+上海工厂(智能)',t:'本月亮点',d:'合计3,890万收入、+1,444万利润,占智能当月收入77%;放量验证了产线与供应链承接能力。'},
+   {n:'重庆车间(智能)',t:'异动提示',d:'收入427万为首次放量,环比+427万;需确认订单真实性及延续性,防止一次性冲量。'},
+   {n:'淮安工厂(供应链)',t:'风险提示',d:'收入仅13.1万、-74.8万利润,产能利用率极低;7月已冻结其自建投资,建议同步评估运营方案。'}]},
+ risks2:[]},
+
+{id:'m5',label:'5月',pdf:'03 2026年5月经营报告@20260615.pdf',pub:'2026-06-15',
+ company:{rev:'5,018.5',mgn:'-1,292.7',op:'未披露',cumRev:'18,652.7',cumMgn:'-7,494.3',momRev:'905.9',momMgn:'223.2',yoyRev:'-2,113.6',yoyMgn:'-4,742.6',rate:'未披露',rateNote:'5月报告未披露全年完成率(按累计18,652.7万/全年目标约11.5亿推算约16%,仅作参考)'},
+ bus:[
+ {n:'工艺事业部',rev:'1,329.4',mgn:'481.2',cumRev:'5,297.5',cumMgn:'1,442.8',mom:'187.3',yoy:'374.5',flag:'ok',note:'盈利主力,武汉工艺单月+408万'},
+ {n:'供应链事业部',rev:'970',mgn:'-291.7',cumRev:'4,098.8',cumMgn:'-1,435.4',mom:'-60.6',yoy:'633.4',flag:'',note:'收入同比+633万,但累计亏损1,435万,同比增亏1,196万'},
+ {n:'智能事业部',rev:'310.9',mgn:'-307.4',cumRev:'808.7',cumMgn:'-1,678',mom:'216.9',yoy:'-899.8',flag:'',note:'同比收入腰斩,嘉定/上海车间深亏'},
+ {n:'通讯5G',rev:'623',mgn:'-162.9',cumRev:'1,155.7',cumMgn:'-798.7',mom:'423.3',yoy:'-3,054.8',flag:'',note:'收入同比-3,055万,为最大同比缺口'},
+ {n:'利敬&三远',rev:'647',mgn:'71.4',cumRev:'2,566.4',cumMgn:'231.9',mom:'16.9',yoy:'314.6',flag:'ok',note:''},
+ {n:'蓝沃数科',rev:'22.7',mgn:'-314.2',cumRev:'22.7',cumMgn:'-1,334',flag:'',note:'当月首笔收入22.7万'},
+ {n:'总部及其他',rev:'-',mgn:'-529.4',cumRev:'-',cumMgn:'-2,648.9',flag:'warn',note:''}],
+ plants:[
+ ['工艺','康桥工厂',377.2,99.4,93.7,''],
+ ['工艺','嘉定工厂',113.7,-24.1,29.4,''],
+ ['工艺','平湖工厂',3,-5.6,-23.9,'收入骤降'],
+ ['工艺','上海工厂',494,69.6,99.2,''],
+ ['工艺','武汉工艺',779.1,408,94.8,'利润环比+90.5万'],
+ ['工艺','长春工厂',56.3,12.1,-6.7,''],
+ ['供应链','川沙工厂',603.7,-97.4,69.2,'亏损收窄'],
+ ['供应链','六安工厂',138.1,-126.9,-56.2,'亏损扩大'],
+ ['供应链','淮安工厂',20.5,-68.4,-10.7,''],
+ ['供应链','武汉工厂',207.7,9.1,-62.9,''],
+ ['智能','康桥车间',228.3,-14.8,157.6,'亏损收窄'],
+ ['智能','嘉定车间',14.6,-180.1,14.6,'深亏'],
+ ['智能','上海工厂',242.9,-194.8,172.2,'深亏'],
+ ['智能','武汉车间',68.1,-21.7,44.7,''],
+ ['智能','重庆车间','-',-62,'-',''],
+ ['5G','亿泊工厂',1,088.3,138.2,187.7,'5G利润主力'],
+ ['5G','南昌工厂',27.2,-32.6,-80.4,''],
+ ['其他','利敬',121,19.2,-10.4,''],
+ ['其他','三远',526,52.2,104.5,'']],
+ risks:[
+ '增收不增利:5月增收905万但利润-1,292.7万,产能利用率不足是主因(川沙/六安/淮安/东莞累计负毛利)',
+ '费用预算持续追加:累计1,035万(5月主要增加管培生240万),需考核管理',
+ '投资预算:Q2预计资金较3+9支出减少4,760万,但全年预计追加2,051万(主要5G和供应链)',
+ '资金:26下半年预计支出1.13亿+27年Q1支出1.77亿(基建1.2亿),合计2.9亿;6月末预计借款5亿(较年初+3亿),部分银行要求收入增加才放款;金租利率高100%',
+ '回款:Q2滚动预测回款1.46亿,较Q1末应收少3,270万(25年前确认收入2,555万),需销售激励追加管理;物流服务部25年底461万交付未开票',
+ '呆滞存货:1,800万,较全年目标900万高100%,缺乏考核机制;技术中心存货394万大部分已被研发领用',
+ '工艺发出商品1,791万(3个月以上762万,三非577万,注意坏账)'],
+ mkt:{pdf:'2026年6月经营分析会材料/02 营销管理中心工作汇报@20260615.pdf',sub:'2026年6月经营分析会材料',
+  facts:['截至6/9集团累计订单3.67亿,同比+48.81%;贡献最大:通讯5G(同比+149.9%)、智能装备(同比+65.2%)(数据事实)','报告高关注事项:通讯5G生产和交付、供应链电子化武汉切量、工艺装备延期(报告原文)'],
+  prob:['订单高增长尚未转化为营收,5月营收环比仅+906万(数据事实)','5G订单与生产交付能力不匹配,是当前最大错配(分析判断)'],
+  advice:['【P0】5G订单-产能匹配:订单导入与东莞工厂产能爬坡联动排产 — 责任:5G事业部/营销管理中心','【P1】供应链武汉切量计划与客户对齐,减少订单波动 — 责任:供应链事业部']},
+ diag:{
+  company:{
+   facts:['5月收入5,018.5万(环比+906万),但管理利润-1,292.7万(数据事实)','呆滞存货1,800万,超全年目标100%(数据事实)','6月末借款将达5亿,较年初+3亿,部分银行以收入增长为放款条件(数据事实)'],
+   judge:['"增收不增利"=产能利用率不足+固定成本刚性,本质是订单结构与产能不匹配(分析判断)','呆滞存货翻倍且无考核机制,是存货管理失效的信号,将直接侵蚀利润与现金流(分析判断)'],
+   top:'本月最紧迫的事:6+6订单导入计划(扭转利用率)+ 呆滞存货处置机制 + 资金预案(银行放款条件)',
+   actions:[
+    {pri:'P0',a:'订单导入:川沙/六安/淮安/东莞6+6订单导入计划,周跟踪到厂',owner:'各事业部'},
+    {pri:'P0',a:'呆滞存货:1,800万呆滞逐项处置方案+责任考核机制',owner:'事业部/财务'},
+    {pri:'P0',a:'资金预案:银行放款条件前置准备(收入证明),金租备选方案',owner:'财务部'},
+    {pri:'P1',a:'费用追加考核:1,035万追加费用逐笔关联收益承诺',owner:'财务部/各中心'}]},
+  bus:[
+   {n:'通讯5G',f:['收入同比-3,054.8万,为各事业部最大同比缺口(数据事实)'],j:['去年5G高基数+今年订单导入滞后(分析判断)'],act:[{pri:'P0',a:'东莞工厂订单(华为/中兴/湘华)导入计划与产能匹配',owner:'5G事业部'}]},
+   {n:'智能事业部',f:['嘉定车间/上海工厂当月合计亏损375万(数据事实)'],j:['新车间爬坡期固定成本前置(分析判断)'],act:[{pri:'P1',a:'两车间爬坡里程碑与盈亏平衡点测算',owner:'智能事业部'}]},
+   {n:'供应链事业部',f:['六安工厂亏损环比扩大(-126.9万)(数据事实)'],j:['订单不足叠加爬坡(分析判断)'],act:[{pri:'P1',a:'六安订单导入与人员配置联动',owner:'供应链事业部'}]}],
+  plant:[
+   {n:'武汉工艺',t:'亮点',d:'779.1万收入、+408万利润(利润率52.4%),连续多月为工艺事业部利润支柱;建议复盘其订单结构以复制。'},
+   {n:'嘉定车间/上海工厂(智能)',t:'深亏区',d:'两板块合计亏损375万,爬坡期固定成本沉重;需明确放量时间表,否则拖累全年。'},
+   {n:'平湖工厂(工艺)',t:'异动提示',d:'收入3万,环比-23.9万,交付断档;需确认订单储备。'}]},
+ risks2:[]},
+
+{id:'m3',label:'3月',pdf:'02-2026年3月经营报告@20260428.pdf',pub:'2026-04-28',
+ company:{rev:'3,790.6',mgn:'-1,310.1',op:'未披露',cumRev:'9,493.8',cumMgn:'-4,731.4',momRev:'1,582.8',momMgn:'614.3',yoyRev:'-2,022',yoyMgn:'-2,907.9',rate:'未披露',rateNote:'3月报告未披露全年完成率(按累计9,493.8万推算约8%,仅作参考)'},
+ bus:[
+ {n:'工艺事业部',rev:'1,154.1',mgn:'340.9',cumRev:'2,826',cumMgn:'629.2',mom:'389.9',yoy:'-155.3',flag:'ok',note:'唯一稳定盈利的事业部,武汉工艺单月+336.7万'},
+ {n:'供应链事业部',rev:'914.6',mgn:'-270.1',cumRev:'2,070.6',cumMgn:'-948.6',mom:'473.3',yoy:'39.8',flag:'',note:'收入回升,累计亏损948.6万,同比增亏794.4万'},
+ {n:'智能事业部',rev:'160.4',mgn:'-360.3',cumRev:'403.7',cumMgn:'-964.3',mom:'100.2',yoy:'-130.9',flag:'',note:'嘉定/上海车间深亏(合计-450万),收入同比-131万'},
+ {n:'通讯5G',rev:'57.7',mgn:'-175.4',cumRev:'333.1',cumMgn:'-446.6',mom:'12.2',yoy:'-1,999.6',flag:'',note:'收入同比-2,000万,断崖式下滑'},
+ {n:'利敬&三远',rev:'551.6',mgn:'52.1',cumRev:'1,289.3',cumMgn:'99.4',mom:'271.1',yoy:'-0.8',flag:'ok',note:''},
+ {n:'蓝沃数科',rev:'-',mgn:'-238.7',cumRev:'-',cumMgn:'-685.6',flag:'',note:''},
+ {n:'总部及其他',rev:'-',mgn:'-521.1',cumRev:'-',cumMgn:'-1,678.7',flag:'warn',note:''}],
+ plants:[
+ ['工艺','康桥工厂',302.6,1,57.2,''],
+ ['工艺','嘉定工厂',131.6,4.7,79.9,''],
+ ['工艺','平湖工厂',9.3,-2.4,-1,''],
+ ['工艺','上海工厂',443.5,3.3,136.1,''],
+ ['工艺','武汉工艺',664.5,336.7,234,'利润环比+183万,利润支柱'],
+ ['工艺','长春工厂',46.2,9.7,19.8,''],
+ ['供应链','川沙工厂',495.5,-66.9,239.6,'亏损收窄'],
+ ['供应链','六安工厂',152,-147.4,95.8,''],
+ ['供应链','淮安工厂','-',-72,'-',''],
+ ['供应链','武汉工厂',267.1,23.7,137.8,''],
+ ['智能','康桥车间',56.1,-125.8,43,''],
+ ['智能','嘉定车间',29.5,-162.4,29.5,''],
+ ['智能','上海工厂',85.6,-288.1,72.5,''],
+ ['智能','武汉车间',74.8,-31.7,27.7,''],
+ ['智能','重庆车间','-',-26.4,'-',''],
+ ['5G','亿泊工厂',900.7,190.9,405.9,'5G唯一盈利板块'],
+ ['5G','南昌工厂',51.4,-28.2,-64.8,''],
+ ['其他','利敬',139,17.6,64.2,''],
+ ['其他','三远',412.7,34.5,206.9,'']],
+ risks:[
+ '3月报告概览页为图片形式,风险事项文字未能提取(标未披露);以下风险基于总览表数据判断',
+ '收入:当月3,790.6万,累计9,493.8万,累计同比-2,022万',
+ '管理利润:当月-1,310.1万,累计-4,731.4万,累计同比增亏2,907.9万',
+ '智能事业部:嘉定车间/上海工厂合计亏损-450.5万,累计亏损-964.3万',
+ '通讯5G:收入同比-1,999.6万(57.7万 VS 2,332.7万),断崖式下滑'],
+ diag:{
+  company:{
+   facts:['3月管理利润-1,310.1万,累计-4,731.4万(数据事实)','收入累计同比-2,022万(数据事实)','通讯5G收入同比-2,000万(数据事实)'],
+   judge:['年初即深度亏损,费用中心(总部/蓝沃/技术)每月固定消耗约1,200万,收入必须翻倍才能盈亏平衡(分析判断)','5G断崖是累计同比最大单一缺口,全年目标兑现的关键在于5G订单恢复(分析判断)'],
+   top:'本月最紧迫的事:5G订单恢复(同比缺口2,000万)+ 智能两车间止损',
+   actions:[
+    {pri:'P0',a:'5G订单导入:华为/中兴新订单获取与交付计划,补2,000万同比缺口',owner:'5G事业部'},
+    {pri:'P0',a:'智能止损:嘉定/上海车间爬坡计划与盈亏平衡点,限期达标',owner:'智能事业部'},
+    {pri:'P1',a:'现金流预判:按Q2-Q4订单预测更新资金计划',owner:'财务部'}]},
+  bus:[
+   {n:'通讯5G',f:['当月收入57.7万,同比-1,999.6万(数据事实)','亿泊工厂+190.9万,是5G唯一利润来源(数据事实)'],j:['老订单交付殆尽+新订单未导入(分析判断)'],act:[{pri:'P0',a:'订单管道清点:在手/在途/预期订单三张清单',owner:'5G事业部'}]},
+   {n:'智能事业部',f:['嘉定车间-162.4万、上海工厂-288.1万(数据事实)'],j:['产线投资前置,订单未跟上(分析判断)'],act:[{pri:'P0',a:'大客户放量时间表确认(后续6月兑现)',owner:'智能事业部'}]},
+   {n:'工艺事业部',f:['武汉工艺+336.7万、康桥+1万(数据事实)'],j:['工艺基本盘稳,但康桥/上海利润率大幅低于去年(分析判断)'],act:[{pri:'P1',a:'康桥/上海毛利结构核查',owner:'工艺事业部'}]}],
+  plant:[
+   {n:'武汉工艺',t:'亮点',d:'664.5万收入、+336.7万利润(利润率50.7%),全公司最大利润来源;工艺事业部的压舱石。'},
+   {n:'上海工厂(智能)',t:'深亏区',d:'-288.1万,为全公司单板块最大亏损;爬坡期成本刚性,需尽快放量。'},
+   {n:'亿泊工厂',t:'亮点',d:'900.7万收入、+190.9万利润,5G板块内唯一盈利单元,力邦业务支撑明显。'}]},
+ risks2:[]}
+];
+
+// ---------- 渲染 ----------
+const tabsEl=document.getElementById('tabs');
+const st=document.createElement('div');
+st.className='tab';st.textContent='公司汇总';
+st.onclick=()=>{renderSummary()};
+tabsEl.appendChild(st);
+MONTHS.forEach((m,i)=>{
+  const t=document.createElement('div');
+  t.className='tab'+(m.default?' active':'');t.textContent=m.label;
+  t.onclick=()=>{render(m)};
+  tabsEl.appendChild(t);
+});
+const tt=document.createElement('div');
+tt.className='tab';tt.textContent='其他关键主题';
+tt.onclick=()=>{renderTopics()};
+tabsEl.appendChild(tt);
+const tw=document.createElement('div');
+tw.className='tab';tw.textContent='管理层周报';
+tw.onclick=()=>{renderWeekly()};
+tabsEl.appendChild(tw);
+function badge(cls,txt){return '<span class="tag '+cls+'">'+txt+'</span>'}
+function fmt(x){return x}
+// ---------- 图表 ----------
+const COLORS=['#2e74b5','#c0392b','#2e7d32','#c56a0a','#7b3fa0','#0e8a8a','#b0488f','#5a6b8a'];
+function fmtNum(v){
+  if(v==null)return '';
+  const a=Math.abs(v);
+  if(a>=100000000)return (v/100000000).toFixed(2)+'亿';
+  if(a>=10000)return (v/10000).toFixed(2)+'万';
+  return Math.round(v*10)/10+'';
+}
+// Catmull-Rom 转三次贝塞尔,生成平滑曲线路径
+function smoothPath(pts){
+  if(pts.length<2)return '';
+  if(pts.length===2){
+    return 'M'+pts[0].x.toFixed(1)+' '+pts[0].y.toFixed(1)+' L'+pts[1].x.toFixed(1)+' '+pts[1].y.toFixed(1);
+  }
+  let d='M'+pts[0].x.toFixed(1)+' '+pts[0].y.toFixed(1)+' ';
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];
+    const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6;
+    const c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
+    d+='C'+c1x.toFixed(1)+' '+c1y.toFixed(1)+' '+c2x.toFixed(1)+' '+c2y.toFixed(1)+' '+p2.x.toFixed(1)+' '+p2.y.toFixed(1)+' ';
+  }
+  return d;
+}
+function drawLine(cfg){
+  const W=940,H=300,PL=80,PR=24,PT=16,PB=42;
+  const n=cfg.labels.length;
+  let lo=0,hi=0;
+  cfg.series.forEach(s=>s.vals.forEach(v=>{if(v==null)return;if(v<lo)lo=v;if(v>hi)hi=v;}));
+  if(hi===0&&lo===0){hi=1;}
+  let span=hi-lo; lo-=span*0.10; hi+=span*0.10;
+  if(lo>0&&!cfg.negForce)lo=0;
+  if(hi<0)hi=0;
+  if(hi-lo<2){hi=lo+2;}
+  const X=i=>PL+(W-PL-PR)*i/(n-1);
+  const Y=v=>(v==null)?null:(PT+(H-PT-PB)*(hi-v)/(hi-lo));
+  let g='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block">';
+  for(let t=0;t<=4;t++){
+    const y=PT+(H-PT-PB)*t/4, v=hi-(hi-lo)*t/4;
+    g+='<line x1="'+PL+'" y1="'+y.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+y.toFixed(1)+'" stroke="#e5e9f0" stroke-width="1"/>';
+    g+='<text x="'+(PL-8)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="10.5" fill="#778">'+fmtNum(v)+'</text>';
+  }
+  g+='<line x1="'+PL+'" y1="'+(H-PB)+'" x2="'+(W-PR)+'" y2="'+(H-PB)+'" stroke="#9aa5b5" stroke-width="1.2"/>';
+  g+='<line x1="'+PL+'" y1="'+PT+'" x2="'+PL+'" y2="'+(H-PB)+'" stroke="#9aa5b5" stroke-width="1.2"/>';
+  cfg.labels.forEach((lb,i)=>{
+    const x=X(i);
+    g+='<text x="'+x+'" y="'+(H-PB+20)+'" text-anchor="middle" font-size="10.5" fill="#556">'+lb+'</text>';
+    g+='<line x1="'+x+'" y1="'+(H-PB)+'" x2="'+x+'" y2="'+(H-PB+4)+'" stroke="#9aa5b5" stroke-width="1"/>';
+  });
+  let lx=PL,ly=0;
+  cfg.series.forEach(s=>{
+    const tw=s.name.length*12.5+36;
+    if(lx+tw>W-PR){lx=PL;ly=15;}
+    g+='<rect x="'+lx+'" y="'+(ly+3)+'" width="12" height="12" rx="2" fill="'+s.color+'"/>';
+    g+='<text x="'+(lx+16)+'" y="'+(ly+13)+'" font-size="11" fill="#333">'+s.name+'</text>';
+    lx+=tw;
+  });
+  cfg.series.forEach(s=>{
+    let seg=[];
+    const flush=()=>{
+      if(seg.length===1){
+        g+='<circle cx="'+seg[0].x.toFixed(1)+'" cy="'+seg[0].y.toFixed(1)+'" r="3.4" fill="'+s.color+'" stroke="#fff" stroke-width="1"/>';
+      }else if(seg.length>1){
+        g+='<path d="'+smoothPath(seg)+'" fill="none" stroke="'+s.color+'" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>';
+      }
+      seg=[];
+    };
+    s.vals.forEach((v,i)=>{
+      const y=Y(v);
+      if(v==null){flush();return;}
+      seg.push({x:X(i),y:y});
+    });
+    flush();
+    s.vals.forEach((v,i)=>{
+      const y=Y(v);if(v==null)return;
+      g+='<circle cx="'+X(i).toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.4" fill="#fff" stroke="'+s.color+'" stroke-width="2"/>';
+      if(cfg.showVal){
+        g+='<text x="'+X(i).toFixed(1)+'" y="'+(y-7).toFixed(1)+'" text-anchor="middle" font-size="9.5" fill="'+s.color+'">'+fmtNum(v)+'</text>';
+      }
+    });
+  });
+  g+='</svg>';
+  return '<div class="chartbox"><div class="charttitle">'+cfg.title+'</div>'+g+(cfg.note?'<div class="note">'+cfg.note+'</div>':'')+'</div>';
+}
+// ---------- 其他关键主题 ----------
+const TOPICS=[
+ {t:'人力经营月报',files:[['人力经营月报(2026年7月期)','2026年7月月度经营分析会材料/03 人力经营月报@20260720.pdf']],
+  facts:['上半年营业收入30,899万,同比+17.6%;总边际13,332万,同比+19.98%(数据事实)','截至6月30日人数1,076人,同比+20.49%(数据事实)','五项重点决策:职能岗冻结招聘(销售及立项技术岗除外)、人效指标纳入N-1三四季度考核(权重≥15%)、各事业部测算新增人数盈亏平衡点、启动Q3盘点汰换、波动型业务灵活用工(数据事实)'],
+  prob:['人数增速(+20.49%)快于收入增速(+17.6%),人效承压(分析判断)','6月财务报告显示人工成本增加3,203万,是经营流出扩大的主因之一(数据事实)'],
+  advice:[{pri:'P0',a:'人效指标(≥15%权重)在N-1考核中落地到人,9月前完成指标定义',owner:'人力资源中心'},{pri:'P1',a:'各事业部新增人数盈亏平衡点测算,Q4起按测算控制增编',owner:'各事业部/人力资源中心'}]},
+ {t:'集团呆滞库存专项治理',files:[['呆滞库存专项治理汇报(2026年7月)','2026年7月月度经营分析会材料/04 集团呆滞库存专项治理汇报@20260720.pdf']],
+  facts:['截至6月底集团呆滞库存总额1,914万,较5月净增316万(+19.8%)(数据事实)','风险高度集中于亿泊(612万)、工艺装备(343万)、通讯5G(340万),三大事业部合计占67%(数据事实)','报告含:整体现状与趋势、6月处理措施复盘、各BU根因剖析、7-9月攻坚计划与激励考核(数据事实)'],
+  prob:['呆滞库存不降反升(+19.8%),既有处置措施未遏制净增(分析判断)','近2,000万资金沉淀直接制约现金流周转效率(分析判断)','5月财务报告亦指出呆滞"缺乏考核机制",与专项治理呼应(数据事实)'],
+  advice:[{pri:'P0',a:'7-9月攻坚计划按月跟踪:亿泊612万/工艺343万/5G 340万三大户分项处置',owner:'供应链管理中心'},{pri:'P0',a:'呆滞处置结果挂钩事业部考核,月度复盘通报',owner:'运营管理中心'}]},
+ {t:'经营分析会待办状态',files:[['专题待办状态(6月会)','2026年6月经营分析会材料/01 月度经营分析会专题待办状态20260615.pdf'],['8月待办状态汇报(9月会)','9月经营分析会报告/01 月度经营分析8月待办状态汇报.pdf']],
+  facts:['6月会:年度投资付款计划2.54亿(原2.2亿追加3,640.14万);Q2调减4,071.65万(32%),全年调减1,930.62万(8%),预计付款2.35亿,缺口1,500万(数据事实)','9月会纪要:7月经营会待办多数已执行/已汇报,一项"搜集数据中,计划10月国庆节后汇报"(数据事实)','会议要求:供应链BU的SDS后续订单缺口,优先切换优质订单(量大品种少),尽快落实详细切换计划@朱军(数据事实)'],
+  prob:['投资与付款计划反复调整,全年付款仍有1,500万缺口来源未落实(分析判断)','部分待办关闭周期长(拖至10月),会议决议执行节奏偏慢(分析判断)'],
+  advice:[{pri:'P0',a:'SDS订单切换计划限期输出(量大品种少优先)',owner:'营销管理中心(朱军)'},{pri:'P1',a:'待办事项周跟踪+到期预警,会议决议48小时内定责任人和时限',owner:'运营管理中心'}]},
+ {t:'月度经营分析会重点摘要(7月会)',files:[['月度经营分析会重点摘要','2026年7月月度经营分析会材料/00 月度经营分析会重点摘要.pdf']],
+  facts:['订单4.88亿,同比+49.85%,完成37.59%;智能、塑胶订单完成率超41%,供应链仅27.86%(数据事实)','7月底预估累计营收3.63亿,同比+18.33%(数据事实)','逾期应收2,468万,大额逾期客户:纳铁福、皮尔博格、力邦,主因验收滞后、价格协议未签(数据事实)','6月累计营收3.08亿仅完成全年27%,累计管理利润亏损8,530万(数据事实)'],
+  prob:['营收、利润双不达标,多板块亏损(数据事实)','应收合规风险突出:长账龄发出商品+逾期应收账款叠加(分析判断)'],
+  advice:[{pri:'P0',a:'930目标冲刺:9月营收按预测值拆解到周跟踪',owner:'各事业部'},{pri:'P0',a:'纳铁福/皮尔博格/力邦大额逾期客户逐个专项谈判(验收+价格协议)',owner:'营销管理中心'}]}
+];
+function renderTopics(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  [...document.querySelectorAll('.tab')].find(t=>t.textContent==='其他关键主题').classList.add('active');
+  let h='';
+  h+='<p class="note">《公司月度经营》文件夹中除月度经营报告、营销管理中心汇报之外的其他关键主题报告,每项附原文打开按钮与分析结论(数据事实/分析判断、问题与建议)。会议通知等纯流程文件未纳入分析。</p>';
+  TOPICS.forEach(tp=>{
+    h+='<div class="sec"><h2>'+tp.t+'</h2><div class="card">';
+    h+='<div class="pdfbar">'+tp.files.map(f=>'<a href="'+PDF_BASE+encodeURI(f[1])+'" target="_blank">📄 打开 '+f[0]+'</a>').join('')+'</div>';
+    h+='<ul class="clean" style="margin-top:10px">'+tp.facts.map(f=>'<li>'+f+'</li>').join('')+'</ul>';
+    h+='<div class="diag" style="margin-top:10px">'
+     +'<div><b>'+badge('judge','问题诊断')+'</b><ul class="judge">'+tp.prob.map(f=>'<li>'+f+'</li>').join('')+'</ul></div>'
+     +'<div><b>建议与行动</b><div class="actions" style="margin-top:2px">'+tp.advice.map(a=>'<div class="act"><span class="pri '+(a.pri==='P0'?'':a.pri.toLowerCase())+'">'+a.pri+'</span><span class="body">'+a.a+'<br><span class="src"><b>责任层级:</b>'+a.owner+'</span></span></div>').join('')+'</div></div>'
+     +'</div></div></div>';
+  });
+  document.getElementById('content').innerHTML=h;
+  document.getElementById('foot').innerHTML='<b>数据来源:</b>D:\\上海精智\\2026\\AI管理\\公司月度经营\\ 各会议材料文件夹 | 生成:2026-09-20 | 主题报告随文件夹新增自动追加到本页签。';
+}
+// ---------- 管理层周报 ----------
+const WEEKLY={
+ updatedAt:'2026-09-20',
+ source:'钉钉「执委会」群 · 周报推送(每人取最新一期)',
+ key:['公司整体订单:未税6.26亿,同比+44.46%(朱军周报,截止9/18)','通讯5G在手订单:已下单5,394.11万+已中标未下单10,662.95万(朱军周报,截止9/19)','工艺装备9月营收目标1,600万,第一轮梳理可完成1,476万,缺口124万(黄贤珍周报)','智能BU订单:截至9/12已获取9,594.78万(于维一周报)'],
+ people:[
+  {n:'汪伟',r:'总裁',t:'2026-09-20 16:33',w:'W38期',key:'本周主线仍是通讯5G事业部,并有两类事项提请执委会:需办公会协调事项与上会议题——为本周经营决策的重点输入',items:['本周重要工作:通讯5G事业部(事业部经营与交付事项,详见周报附件表格/图片)','提请事项:①"需执委会办公会协调"事项 ②"本期或本周上会议题"——具体内容见附件,是执委会本周决策输入'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a099492b27140971d41a9c4f5bb21eb&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'朱军',r:'营销管理中心',t:'2026-09-20 16:28',w:'W38期',key:'订单总量6.26亿、同比+44.46%的高增长仍在延续;5G"已中标未下单"超1.06亿,转化是全年营收的关键变量',items:['集团订单:累计未税6.26亿元,同比+44.46%(数据截止9/18)','通讯5G:已下单5,394.11万 + 已中标未下单10,662.95万(数据截止9/19)——未下单部分转化节奏决定Q4营收','其余各板块订单结构详见周报附件图片(表格化明细)'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a0bdee635029a6d544bebf4f63a9c6f&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'郑亮',r:'副总裁 · 塑胶科技',t:'2026-09-20 16:27',w:'W38期',key:'塑胶科技板块本周工作与待协调事项全量上报,且为本周有"上会议题"的高管之一',items:['本周重要工作:塑胶科技事业部整体推进(详见附件表格,含经营与项目事项)','含下周工作计划、需执委会办公会协调事项、本期上会议题(详见附件表格)'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a0bded1bb490fc2a07fd2f433e8da76&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'张明涛',r:'',t:'2026-09-20 15:53',w:'W38期',key:'重点项目攻坚周:伯特利万达MSG验收逐项闭环 + 奇瑞艾曼新项目启动,交付质量与项目滚动双线并进',items:['①芜湖伯特利万达MSG项目验收专题会(9/14上午):聚焦验收遗留问题,逐项梳理卡点、制定闭环措施,全力推动项目最终验收落地','②奇瑞艾曼轮胎输送线项目:方案探讨启动','其他重点项目进展详见周报附件图片'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a0bdce62c386e51c6733444faa9574f&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'陈祖荣',r:'',t:'2026-09-13 11:28',w:'W37期',key:'周报覆盖经营数据→重点工作→下周计划→需协调上会四层,含"需要协调上会事项"——有议题需要公司层面资源与决策支持',items:['经营数据:本周经营口径数据(详见附件表格)','重点工作推进:分项推进情况(详见附件表格)','下周工作计划 + 需要协调上会事项(详见附件表格)——上会事项为执委会决策输入'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a098cf1162f22f5d75ede1444c8de91&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'金悦',r:'',t:'2026-09-13 11:35',w:'W37期',key:'本周工作以表格+图片双载体上报,含下周工作计划——管理事项颗粒度较细',items:['本周重要工作(附件表格+图片,含分项管理事项)','下周工作计划(附件表格)'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a098d5df4733b348b8ac0341e5bf021&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'刘超',r:'',t:'2026-09-13 10:41',w:'W37期',key:'工作周报三段式:完成工作(表格)+工作总结(图片)+下周计划(表格),总结部分以图片呈现',items:['本周完成工作:分项清单(附件表格)','本周工作总结:以图片呈现的总结(附件图片)','下周工作计划(附件表格)'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a098a40af193ac883ad0774d34b0e59&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'黄贤珍',r:'工艺装备',t:'2026-09-13 10:58',w:'W37期',key:'工艺装备9月冲刺:目标1,600万、缺口124万,抓手是客户起量+交付+客户预算使用情况',items:['核心经营数据:9月营收目标1,600万,第一轮与销售对齐可完成1,476万,缺口124万','冲刺策略:结合9月客户起量,关注交付兑现与客户预算使用情况','本周工作总结 + 生产管理数据及重点情况(详见附件表格)'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a098b38a9897cc9a78783d43bfa8409&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'于维一',r:'董助',t:'2026-09-13 10:54',w:'W37期',key:'董助三条线:公司级专题待办跟踪 + 9月经营分析会组织(9/16召开)+ 智能BU订单数据盯盘',items:['董助工作:公司级专题待办进展状态(表格)','经营分析会:9月经营分析会9/16召开,初版报告要求9/14晚提交','智能BU订单盯盘:截至9/12已获取订单9,594.78万,同比+61.47%'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a09879b3ed97002c1472cb47e8bd0bb&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'潘酉海',r:'财务中心',t:'2026-09-13 16:58',w:'W37期',key:'财务中心周报:本周重要工作+下周计划双段式(详见附件表格);同期交付了8月经营报告(9/16发布)',items:['本周重要工作(附件表格)','下周工作计划(附件表格)','关联:其负责的《2026年8月经营报告》已于9/16经营分析会发布(见8月页签)'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a099fcfc63cdde1dcd89714982818c0&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'汪菊',r:'',t:'2026-09-13 18:48',w:'W37期',key:'周报五大板块:订单及运营数据/内部管理/降本增效/外联工作/日程安排,覆盖运营全维度',items:['订单及运营数据(附件表格)','内部管理(附件表格)','降本增效(附件表格)——呼应公司降本主线','外联工作 + 日程安排(附件表格/图片)','下周工作计划(附件表格)'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a09a6217865d38ba6f9821498da9d2b&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'夏文杰',r:'',t:'2026-09-13 19:43',w:'W37期',key:'本周工作与下周计划合并呈现,每项工作均带后续推进计划——闭环式汇报',items:['本周重要工作(附件表格)','下周工作计划:已合并到本周工作计划内,每项工作后续有对应的下周推进计划(附件表格)'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a09a942f7b94a14318bdf442eca6440&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'李阳',r:'副总裁',t:'2026-09-13 22:28',w:'W37期',key:'副总裁周报三段式,含"本期上会议题"——有事项进入执委会决策流程',items:['本周重要工作(附件表格)','下周工作计划(附件表格)','本期或本周上会议题(附件表格)'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a09b2bc76c2a3bd39358d8446cb8367&corpid=ding27295497fa81748135c2f4657eb6378f'},
+  {n:'严潇',r:'',t:'2026-09-12 23:48',w:'W37期',key:'SDS转产关键节点:2款实轴完成系统审批(仅剩物流包装方案)、4款审批中,重点跟进转产系统流程',items:['SDS开发状态看板:2款实轴(SC3HAL)转产正式转至泛微转产系统审批,除物流运输包装方案外均已完成系统审批','4款实轴(ST2E/ANB)转产系统审批中,重点跟进转产系统流程闭环'],link:'https://landray.dingtalkapps.com/alid/app/report/viewReport_new.html?id=1a0964e09590ea977d201294bf38abbb&corpid=ding27295497fa81748135c2f4657eb6378f'}
+ ]
+};
+function renderWeekly(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  [...document.querySelectorAll('.tab')].find(t=>t.textContent==='管理层周报').classList.add('active');
+  let h='';
+  h+='<p class="note">数据来源:'+WEEKLY.source+' | 更新时间:'+WEEKLY.updatedAt+' | <b>每人仅显示执委会群内最新一期周报</b>(已剔除更早历史期次);每条周报均标注来源时间与期次;周报正文中的表格/图片附件无法在网页解析,已标注"详见附件"并附钉钉原文链接(需钉钉账号打开)。</p>';
+  h+='<div class="sec"><h2>本周关键数据(管理层周报口径)</h2><div class="card"><ul class="clean">'
+   +WEEKLY.key.map(k=>'<li>'+k+'</li>').join('')+'</ul></div></div>';
+  h+='<div class="sec"><h2>各人周报汇总(14人,按来源时间倒序)</h2>';
+  WEEKLY.people.forEach(p=>{
+    const isNew=(p.w==='W38期');
+    h+='<div class="card" style="margin-bottom:10px">'
+     +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">'
+     +'<div><b style="font-size:15px;color:var(--dark)">'+p.n+'</b>'+(p.r?'<span class="wb-role">'+p.r+'</span>':'')+'</div>'
+     +'<div><span class="wb-time">来源时间:'+p.t+'</span><span class="wb-w'+(isNew?' new':'')+'">'+p.w+'</span></div></div>'
+     +(p.key?'<div class="wb-key">★ <b>本周重点:</b>'+p.key+'</div>':'')
+     +'<ul class="clean" style="margin-top:6px">'+p.items.map(i=>'<li>'+i+'</li>').join('')+'</ul>'
+     +'<div class="pdfbar" style="margin-top:8px"><a href="'+p.link+'" target="_blank">📄 查看原文周报(钉钉登录)</a></div>'
+     +'</div>';
+  });
+  h+='</div>';
+  document.getElementById('content').innerHTML=h;
+  document.getElementById('foot').innerHTML='<b>数据来源:</b>钉钉「执委会」群周报推送(每人最新一期)| 更新时间:'+WEEKLY.updatedAt+' | 有新周报推送后,对 Claude 说"更新管理层周报"即可刷新本页数据。';
+}
+function renderSummary(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  [...document.querySelectorAll('.tab')].find(t=>t.textContent==='公司汇总').classList.add('active');
+  let h='';
+  h+='<div class="grid3">'
+   +kpi('累计收入(截至8月)','50,694 万','完成率44% · 落后时间进度23个百分点 · 累计同比+15,262万','orange')
+   +kpi('累计管理利润(截至8月)','-8,947 万','8+4预测全年亏损1.40亿(较预算增亏3,007万)','red')
+   +kpi('资金与回款(截至8月)','贷款 5.53 亿','较年初+3.37亿 · 逾期应收2,343万 · 9月付款计划7,843万','red')
+   +'</div><p class="note">数据截止:2026-09-16(8月报告发布日)· 全年目标约11.5亿</p>';
+  // 月度趋势
+  h+='<div class="sec"><h2>公司整体 · 月度趋势(3-8月,金额单位:万元)</h2><div class="card"><table>'
+   +'<tr><th>指标</th><th>3月</th><th>5月</th><th>6月</th><th>7月</th><th>8月</th><th>趋势解读</th></tr>'
+   +'<tr><td class="l">当月收入</td><td>3,790.6</td><td>5,018.5</td><td>12,169.5</td><td>9,957</td><td>9,838</td><td class="l">6月放量(智能嘉定/上海+5G集中交付)后回落至约1亿/月;4月报告缺失,未披露</td></tr>'
+   +'<tr><td class="l">当月管理利润</td><td class="neg">-1,310.1</td><td class="neg">-1,292.7</td><td class="pos">+1,031.9</td><td class="pos">+270</td><td class="neg">-767</td><td class="l">6-7月短暂转正后8月再度转亏,盈亏平衡尚未站稳</td></tr>'
+   +'<tr><td class="l">累计收入</td><td>9,493.8</td><td>18,652.7</td><td>30,899.2</td><td>40,856</td><td>50,694</td><td class="l">1-8月月均6,337万;剩4个月需月均16,077万才能达成全年目标(分析判断)</td></tr>'
+   +'<tr><td class="l">累计管理利润</td><td class="neg">-4,731.4</td><td class="neg">-7,494.3</td><td class="neg">-8,530.2</td><td class="neg">-8,179</td><td class="neg">-8,947</td><td class="l">亏损中枢在-8,000万~-9,000万区间,8+4预测全年-1.40亿意味着Q4还要再亏5,000万(分析判断)</td></tr>'
+   +'<tr><td class="l">累计同比(收入)</td><td class="neg">-2,022</td><td class="neg">-2,113.6</td><td class="pos">+4,631.5</td><td class="pos">+10,124</td><td class="pos">+15,262</td><td class="l">6月起累计同比转正并扩大,去年低基数+今年专项收入驱动</td></tr>'
+   +'<tr><td class="l">全年完成率</td><td>未披露</td><td>未披露</td><td>27%</td><td>35%</td><td>44%</td><td class="l">落后时间进度(8/12≈67%)23个百分点;按当前节奏全年约66%-78%(分析判断,见下方结论)</td></tr>'
+   +'</table><p class="note">来源:各月《经营报告》总览表合计1行;4月报告未放入文件夹,相关列未披露</p></div></div>';
+  // ===== 业绩曲线 =====
+  const LBL=['3月','5月','6月','7月','8月'];
+  h+='<div class="sec"><h2>业绩曲线 · ① 公司整体(当月收入 & 管理利润,万元)</h2><div class="card">'
+   +drawLine({title:'公司业绩曲线',labels:LBL,showVal:true,note:'4月报告未放入文件夹,曲线跳过4月(未披露);管理利润为负=当月亏损;6月放量转正后8月再度转亏',
+     series:[
+      {name:'收入',color:'#2e74b5',vals:[3790.6,5018.5,12169.5,9957,9838]},
+      {name:'管理利润',color:'#c0392b',vals:[-1310.1,-1292.7,1031.9,270,-767]}]})
+   +'</div></div>';
+  // 事业部收入/利润
+  const BREV={'工艺事业部':[1154.1,1329.4,2028.4,1644,1657],'供应链事业部':[914.6,970,1097.7,1238,1462],'智能事业部':[160.4,310.9,2801.4,2650,2527],'通讯5G':[57.7,623,3830.7,2636,2261],'利敬&三远':[551.6,647,692.2,577,571],'蓝沃数科':[null,22.7,111.3,14,19]};
+  const BMGN={'工艺事业部':[340.9,481.2,779.9,452,506],'供应链事业部':[-270.1,-291.7,-218.9,-144,-245],'智能事业部':[-360.3,-307.4,826.4,647,215],'通讯5G':[-175.4,-162.9,391.5,649,-142],'利敬&三远':[52.1,71.4,104,53,7],'蓝沃数科':[-238.7,-314.2,-180.1,-289,-344]};
+  h+='<div class="sec"><h2>业绩曲线 · ② 各事业部(当月收入,万元)</h2><div class="card">'
+   +drawLine({title:'各事业部收入曲线',labels:LBL,note:'6月智能/5G集中放量后回落;蓝沃3月收入为0(曲线起点缺失)',
+     series:Object.keys(BREV).map((k,i)=>({name:k,color:COLORS[i],vals:BREV[k]}))})
+   +'</div></div>';
+  h+='<div class="sec"><h2>业绩曲线 · ③ 各事业部(当月管理利润,万元)</h2><div class="card">'
+   +drawLine({title:'各事业部管理利润曲线',labels:LBL,note:'零轴以上为盈利;智能6月扭亏、5G在6-7月转正后8月再度为负',
+     series:Object.keys(BMGN).map((k,i)=>({name:k,color:COLORS[i],vals:BMGN[k]}))})
+   +'</div></div>';
+  // 板块曲线(按事业部)
+  const PLANTS={
+   '工艺事业部':{'康桥工厂':[302.6,377.2,942.1,573,687],'嘉定工厂':[131.6,113.7,321.4,56,93],'平湖工厂':[9.3,3,24.7,15,14],'上海工厂':[443.5,494,1288.2,644,793],'武汉工艺':[664.5,779.1,679.6,958,808],'长春工厂':[46.2,56.3,60.6,42,56]},
+   '供应链事业部':{'川沙工厂':[495.5,603.7,608.9,516,650],'六安工厂':[152,138.1,173.2,232,412],'淮安工厂':[null,20.5,13.1,136,43],'武汉工厂':[267.1,207.7,302.5,355,357]},
+   '智能事业部':{'康桥车间':[56.1,228.3,462.1,1012,757],'嘉定车间':[29.5,14.6,1714.1,1586,1444],'上海工厂':[85.6,242.9,2176.2,2598,2201],'武汉车间':[74.8,68.1,198.2,40,326],'重庆车间':[null,null,427,12,null]},
+   '通讯5G':{'亿泊工厂':[900.7,1088.3,1059.5,1079,1124],'南昌工厂':[51.4,27.2,541.1,111,216]},
+   '其他':{'利敬':[139,121,219.7,94,109],'三远':[412.7,526,472.5,483,462],'蓝沃数科':[null,22.7,111.3,14,19]}
+  };
+  h+='<div class="sec"><h2>业绩曲线 · ④ 各板块(当月收入,万元)</h2>';
+  Object.keys(PLANTS).forEach((bu,bi)=>{
+    h+='<div class="card"><div style="font-weight:700;color:var(--dark);margin-bottom:6px">'+bu+' · 板块收入曲线</div>'
+     +drawLine({title:'',labels:LBL,note:'',
+       series:Object.keys(PLANTS[bu]).map((k,i)=>({name:k,color:COLORS[i],vals:PLANTS[bu][k]}))})
+     +'</div>';
+  });
+  h+='</div>';
+  // ===== 现金流曲线 =====
+  h+='<div class="sec"><h2>现金流曲线(万元,除贷款外)</h2><div class="card">'
+   +drawLine({title:'货币资金 · 月末余额(年初-8月)',labels:['年初','1月','2月','3月','4月','5月','6月','7月','8月'],showVal:true,note:'来源:7月/8月报告资金概况;5月跌至5,821万后6月回升,8月15,021万',
+     series:[{name:'货币资金',color:'#2e74b5',vals:[15770,9318,8078,10578,9051,5821,13638,15000,15021]}]})
+   +'</div></div>';
+  h+='<div class="sec"><h2>现金流曲线 · 月度流入/流出/净额(1-6月,万元)</h2><div class="card">'
+   +drawLine({title:'月度现金流入 · 流出 · 净额',labels:['1月','2月','3月','4月','5月','6月'],showVal:true,note:'来源:6月报告《经营指标-现金流趋势》2026年数据;流出=流入-净额推算;7-8月月度流入/流出报告未披露',
+     series:[
+      {name:'流入',color:'#2e7d32',vals:[4996.3,2974.4,7876.4,4574.5,3742.3,9817.4]},
+      {name:'流出(推算)',color:'#c56a0a',vals:[12785.5,7216.7,8194.3,8841.6,8742.5,8141.1]},
+      {name:'净额',color:'#c0392b',vals:[-7789.2,-4242.3,-317.9,-4267.1,-5000.2,1676.3]}]})
+   +'</div></div>';
+  h+='<div class="sec"><h2>现金流曲线 · 贷款余额(亿元)</h2><div class="card">'
+   +drawLine({title:'贷款余额',labels:['6月末','7月','8月'],showVal:true,note:'6月末为5月报告披露的预计值(5.0亿);3-5月末余额未披露;较年初累计增加约3.3-3.4亿',
+     series:[{name:'贷款余额',color:'#7b3fa0',vals:[5.0,5.22,5.53]}]})
+   +'</div></div>';
+  // 事业部累计
+  h+='<div class="sec"><h2>各事业部 · 截至8月累计一览(金额单位:万元)</h2><div class="card"><table>'
+   +'<tr><th>事业部</th><th>累计收入</th><th>累计管理利润</th><th>全年完成率</th><th>定性</th></tr>'
+   +'<tr><td class="l">工艺事业部</td><td>10,626</td><td class="pos">+2,955</td><td>未披露</td><td class="l">利润压舱石(武汉工艺+2,330万)</td></tr>'
+   +'<tr><td class="l">供应链事业部</td><td>7,973</td><td class="neg">-1,921</td><td>未披露</td><td class="l">增收不增利,六安/淮安深亏</td></tr>'
+   +'<tr><td class="l">智能事业部</td><td>8,787</td><td class="pos">+9</td><td>48%(剔除专项29%)</td><td class="l">靠专项撑量,6月起放量,刚达盈亏平衡</td></tr>'
+   +'<tr><td class="l">通讯5G</td><td>9,884</td><td class="pos">+100</td><td>33%(剔除专项19%)</td><td class="l">完成率最低,8月利润转负</td></tr>'
+   +'<tr><td class="l">利敬&三远</td><td>4,406</td><td class="pos">+391</td><td>未披露</td><td class="l">稳定盈利</td></tr>'
+   +'<tr><td class="l">蓝沃数科</td><td>167</td><td class="neg">-2,150</td><td>18%</td><td class="l">商业模式待验证,持续失血</td></tr>'
+   +'<tr><td class="l">总部及其他</td><td>—</td><td class="neg">-6,310</td><td>—</td><td class="l">含IPO费用2,210万,费用刚性</td></tr>'
+   +'</table><p class="note">完成率仅8月报告披露的板块有值;其余未披露</p></div></div>';
+  // ===== 营销总览 =====
+  h+='<div class="sec"><h2>营销总览(营销管理中心,各期累计口径)</h2><div class="card">'
+   +drawLine({title:'集团累计订单金额(亿元)· 订单完成率(%)',labels:['5月期','6月期','7月期','8月期'],showVal:true,note:'各期=对应月度经营分析会的营销汇报;5月期完成率未披露(按3.67亿/全年13.39亿推算27.4%,仅供参考);订单同比各期均在+46%~+50%',
+     series:[
+      {name:'订单金额(亿)',color:'#2e74b5',vals:[3.67,4.88,5.45,6.24]},
+      {name:'完成率(%)',color:'#c0392b',vals:[27.4,37.59,40.71,46.6]}]})
+   +drawLine({title:'逾期应收账款(万元)· 发出商品-工艺(万元)',labels:['6月','7月','8月'],showVal:true,note:'逾期应收:6月2,468万→7月2,262万→8月2,343.6万;工艺发出商品:7月1,245.01万→8月1,135.83万(-8.77%);纳铁福/皮尔博格/力邦为大额逾期客户',
+     series:[
+      {name:'逾期应收',color:'#c0392b',vals:[2468,2262,2343.6]},
+      {name:'工艺发出商品',color:'#2e7d32',vals:[null,1245.01,1135.83]}]})
+   +'</div></div>';
+  h+='<div class="sec"><h2>营销总览 · 各板块订单完成率(8月期,截至9/11)</h2><div class="card"><table>'
+   +'<tr><th>板块</th><th>累计订单(万)</th><th>全年目标(万)</th><th>完成率</th><th>解读</th></tr>'
+   +'<tr><td class="l">工艺装备</td><td>11,347.53</td><td>19,712.28</td><td>57.57%</td><td class="l">老客户份额保持,平稳推进</td></tr>'
+   +'<tr><td class="l">智能装备</td><td>9,594.78</td><td>20,000</td><td>47.97%</td><td class="l">同比+61.47%;军令状2.1亿,差值12,405万,冲刺压力大</td></tr>'
+   +'<tr><td class="l">塑胶科技</td><td>9,257.59</td><td>13,002.57</td><td>71.20%</td><td class="l">各板块完成率最高</td></tr>'
+   +'<tr><td class="l">供应链电子化</td><td>8,463.43</td><td>20,113.01</td><td>42.08%</td><td class="l">六安22.69%/淮安7.21%严重拖累;挑战目标调整为1.8亿</td></tr>'
+   +'<tr><td class="l">通讯5G(东莞)</td><td>16,875.54</td><td>46,000</td><td>36.69%</td><td class="l">在手订单含已中标未下单11,491.33万,转化是关键</td></tr>'
+   +'<tr><td class="l">南昌/利敬/三远</td><td>2,228.96/1,054.18/3,589.84</td><td>3,000/1,234.02/5,765.94</td><td>74.30%/85.43%/62.26%</td><td class="l">小体量高完成率,基本盘稳</td></tr>'
+   +'<tr><td class="l">集团合计</td><td>62,411.86</td><td>133,918.37</td><td>46.60%</td><td class="l">同比+46.98%;落后时间进度(9/12≈75%)28个百分点</td></tr>'
+   +'</table><p class="note">来源:9月经营分析会《营销管理中心工作汇报@20260916》;5G订单含已下单5,384.21万+已中标未下单11,491.33万</p></div></div>';
+  h+='<div class="sec"><h2>营销问题与建议(汇总级)</h2><div class="card"><div class="diag">'
+   +'<div><b>'+badge('fact','数据事实')+'</b><ul class="facts">'
+   +'<li>订单完成率46.60%,落后时间进度28个百分点(数据事实)</li>'
+   +'<li>Q3回款测算19,748.9万,缺口6,181.6万;逾期账款2,343.6万(数据事实)</li>'
+   +'<li>通讯5G已中标未下单11,491.33万,供应链六安/淮安完成率22.69%/7.21%(数据事实)</li></ul></div>'
+   +'<div><b>'+badge('judge','分析判断')+'</b><ul class="judge">'
+   +'<li>订单总量高增长(+46.98%)但完成率落后,瓶颈在"已中标未下单"转化与订单→交付→营收链条(分析判断)</li>'
+   +'<li>智能逾期中"项目问题215.11万+客户原因226.66万"说明交付质量本身在侵蚀回款(分析判断)</li></ul></div></div>'
+   +'<div class="actions">'
+   +'<div class="act"><span class="pri">P0</span><span class="body">已中标未下单订单(5G 11,491万+其他板块)逐项排客户侧转化计划,周跟踪 — <span class="src"><b>责任层级:</b>营销管理中心</span></span></div>'
+   +'<div class="act"><span class="pri">P0</span><span class="body">Q3回款缺口6,181.6万逐户补救方案;纳铁福/皮尔博格/力邦专项谈判 — <span class="src"><b>责任层级:</b>营销管理中心/财务部</span></span></div>'
+   +'<div class="act"><span class="pri p1">P1</span><span class="body">智能军令状2.1亿Q4冲刺方案+供应链六安/淮安订单导入与产能匹配 — <span class="src"><b>责任层级:</b>智能事业部/供应链事业部</span></span></div>'
+   +'</div></div></div>';
+  // 风险演变
+  h+='<div class="sec"><h2>关键风险指标 · 逐月演变(未披露=当月报告未提供)</h2><div class="card"><table>'
+   +'<tr><th>指标</th><th>5月</th><th>6月</th><th>7月</th><th>8月</th><th>趋势解读</th></tr>'
+   +'<tr><td class="l">贷款余额(亿)</td><td>5.0(6月末预计)</td><td>未披露</td><td>5.22</td><td>5.53</td><td class="l">持续攀升,较年初+3.37亿,已近授信上限</td></tr>'
+   +'<tr><td class="l">逾期应收(万)</td><td>未披露</td><td>2,468</td><td>2,262</td><td>2,343</td><td class="l">7月下降后8月回升80万,交付质量影响回款</td></tr>'
+   +'<tr><td class="l">呆滞存货(万)</td><td>1,800</td><td>1,754</td><td>1,976</td><td>1,614</td><td class="l">高位震荡,距全年目标900万仍高79%</td></tr>'
+   +'<tr><td class="l">采购降本&VAVE累计(万)</td><td>未披露</td><td>356</td><td>432</td><td>518</td><td class="l">改善中,但距全年目标1,845万仅完成28%</td></tr>'
+   +'<tr><td class="l">费用预算追加累计(万)</td><td>1,035</td><td>1,042</td><td>1,282</td><td>1,117</td><td class="l">8月较7月口径下降,报告未说明调减原因,存口径差异</td></tr>'
+   +'<tr><td class="l">客户仓未定价(万)</td><td>未披露</td><td>896(25年部分)</td><td>19,565(全量)</td><td>19,776</td><td class="l">7月起改全量口径;8月含预收3,387万,待定价开票回款</td></tr>'
+   +'</table></div></div>';
+  // 结论
+  h+='<div class="sec"><h2>公司整体结论(截至8月)'+badge('judge','分析判断')+'</h2><div class="card"><ul class="clean">'
+   +'<li><b>收入节奏:</b>1-8月累计5.06亿,月均6,337万;剩4个月需月均16,077万(当前月均的2.5倍)才能完成全年目标11.5亿。按当前节奏全年落在7.6-9.0亿区间,完成率约66%-78%,<b>全年收入缺口约2.5-3.9亿</b>。补缺口的现实路径:客户仓19,776万未定价部分开票转化+华为/湘华/舜富等订单拉动,不能指望自然增长。</li>'
+   +'<li><b>利润节奏:</b>累计亏损8,947万,8+4预测全年亏1.40亿——意味着9-12月还要再亏约5,000万(其中IPO费用约4,000万按计划计提)。若剔除IPO费用,全年经营亏损约6,000万,主要增亏点集中在供应链、智能、5G,需按P0清单逐项关闭。</li>'
+   +'<li><b>资金节奏:</b>贷款5.53亿+9月付款压至7,843万=以收定支的紧平衡;半年报函证大多数客户无法相符回函、审计调整风险、银行"收入增长才放款"的要求,三者叠加是下半年最大的隐性风险。资金安全优先级高于一切扩张动作。</li>'
+   +'</ul></div></div>';
+  document.getElementById('content').innerHTML=h;
+  document.getElementById('foot').innerHTML='<b>数据来源:</b>D:\\上海精智\\2026\\AI管理\\公司月度经营\\ 3/5/6/7/8月经营报告 | <b>数据截止:</b>2026-09-16 | 生成:2026-09-20 | 汇总页为跨月聚合,单月明细请切换对应月份页签。';
+}
+function render(m){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  [...document.querySelectorAll('.tab')].find(t=>t.textContent===m.label).classList.add('active');
+  let h='';
+  // KPI
+  const c=m.company;
+  h+='<div class="grid3">'
+   +kpi('当月收入',c.rev+' 万','环比 '+(c.momRev[0]==='-'?c.momRev:'+'+c.momRev)+' 万 · 累计 '+c.cumRev+' 万','blue')
+   +kpi('当月管理利润',c.mgn+' 万','累计 '+c.cumMgn+' 万 · 同比 '+(c.yoyMgn[0]==='-'?c.yoyMgn:'+'+c.yoyMgn)+' 万',c.mgn[0]==='-'?'red':'green')
+   +kpi('全年完成率(累计收入)',c.rate,'累计同比 '+(c.yoyRev[0]==='-'?c.yoyRev:'+'+c.yoyRev)+' 万',c.rate==='未披露'?'gray':'orange')
+   +'</div><p class="note">'+c.rateNote+'</p>';
+  // 原始报告
+  h+='<div class="sec"><h2>原始报告</h2><div class="card"><div class="pdfbar">'
+    +'<a href="'+PDF_BASE+encodeURI(m.pdf)+'" target="_blank">📄 打开 '+m.label+'经营报告 PDF</a>'
+    +'<span class="cutoff">数据截止日期:'+m.pub+' | 报告人:潘酉海(财务中心) | 未披露指标已标注,不臆造</span>'
+    +'</div></div></div>';
+  // 公司整体
+  h+='<div class="sec"><h2>三级透视 · ① 公司整体</h2><div class="card"><table><tr><th>指标</th><th>当月值</th><th>累计值</th><th>环比</th><th>累计同比</th><th>异动标注</th></tr>'
+   +'<tr><td class="l">收入(万)</td><td>'+c.rev+'</td><td>'+c.cumRev+'</td><td>'+c.momRev+'</td><td>'+c.yoyRev+'</td><td>'+c.rateNote.split(';')[0]+'</td></tr>'
+   +'<tr><td class="l">管理利润(万)</td><td class="'+(c.mgn[0]==='-'?'neg':'pos')+'">'+c.mgn+'</td><td class="neg">'+c.cumMgn+'</td><td>'+c.momMgn+'</td><td class="neg">'+c.yoyMgn+'</td><td>'+(c.mgn[0]==='-'?'当月亏损':'当月盈利')+'</td></tr>'
+   +'<tr><td class="l">营业利润(万)</td><td>'+(c.op||'未披露')+'</td><td>未披露</td><td>未披露</td><td>未披露</td><td>3月/5月报告未披露该口径</td></tr>'
+   +'</table><p class="note">来源:'+m.label+'经营报告《主要经济指标-总览》· 合计1行</p></div></div>';
+  // 事业部
+  h+='<div class="sec"><h2>三级透视 · ② 各事业部(交付口径,万)</h2><div class="card"><table><tr><th>事业部</th><th>当月收入</th><th>当月管理利润</th><th>累计收入</th><th>累计管理利润</th><th>环比</th><th>累计同比</th><th>异动与归因</th></tr>';
+  m.bus.forEach(b=>{
+    h+='<tr><td class="l">'+b.n+'</td><td>'+(b.rev||'—')+'</td><td class="'+(String(b.mgn||'').startsWith('-')?'neg':'pos')+'">'+(b.mgn||'—')+'</td><td>'+(b.cumRev||'—')+'</td><td class="'+(String(b.cumMgn||'').startsWith('-')?'neg':'pos')+'">'+(b.cumMgn||'—')+'</td><td>'+(!b.mom?'—':(String(b.mom).startsWith('-')?b.mom:'+'+b.mom))+'</td><td>'+(!b.yoy?'—':(String(b.yoy).startsWith('-')?b.yoy:'+'+b.yoy))+'</td><td class="l" style="white-space:normal;text-align:left">'+(b.note||'')+'</td></tr>';
+  });
+  h+='</table><p class="note">来源:同月报告总览表事业部小计行;蓝沃/总部为费用中心</p></div></div>';
+  // 板块
+  h+='<div class="sec"><h2>三级透视 · ③ 各中心/板块('+m.label+'当月,万)</h2><div class="card"><table><tr><th>事业部</th><th>板块</th><th>当月收入</th><th>当月管理利润</th><th>环比(收入)</th><th>异动与归因</th></tr>';
+  m.plants.forEach(p=>{
+    const momv=(p[4]===undefined||p[4]==='')?'—':(String(p[4]).startsWith('-')?p[4]:'+'+p[4]);
+    const mgv=(p[3]==='-'||p[3]==='')?'—':p[3];
+    h+='<tr><td>'+p[0]+'</td><td class="l">'+p[1]+'</td><td>'+(p[2]==='-'?'—':p[2])+'</td><td class="'+(String(p[3]).startsWith('-')?'neg':(p[3]==='-'||p[3]===''?'':'pos'))+'">'+mgv+'</td><td>'+momv+'</td><td class="l" style="white-space:normal;text-align:left">'+(p[5]||'')+'</td></tr>';
+  });
+  h+='</table><p class="note">板块级仅列当月;更细累计数据见原始报告总览表</p></div></div>';
+  // 营销汇报(同期)
+  if(m.mkt){
+    h+='<div class="sec"><h2>营销管理中心工作汇报(同期)'+badge('fact','数据事实')+'</h2><div class="card"><div class="pdfbar">'
+      +'<a href="'+PDF_BASE+encodeURI(m.mkt.pdf)+'" target="_blank">📄 打开营销汇报 PDF</a>'
+      +'<span class="cutoff">来源:'+m.mkt.sub+'</span></div>'
+      +'<ul class="clean">'+m.mkt.facts.map(f=>'<li>'+f+'</li>').join('')+'</ul>'
+      +'<div class="diag" style="margin-top:12px">'
+      +'<div><b>'+badge('judge','问题诊断')+'</b><ul class="judge">'+m.mkt.prob.map(f=>'<li>'+f+'</li>').join('')+'</ul></div>'
+      +'<div><b>建议与行动</b><ul class="facts">'+m.mkt.advice.map(f=>'<li>'+f+'</li>').join('')+'</ul></div>'
+      +'</div></div></div>';
+  }else{
+    h+='<div class="sec"><h2>营销管理中心工作汇报(同期)</h2><div class="card"><p class="note">该月文件夹内无营销汇报材料,未披露(3月经营分析会材料缺失)。</p></div></div>';
+  }
+  // 风险
+  h+='<div class="sec"><h2>本月风险事项(数据事实)</h2><div class="card"><ul class="clean">';
+  m.risks.forEach(r=>{h+='<li>'+r+'</li>'});
+  h+='</ul></div></div>';
+  // 诊断
+  h+='<div class="sec"><h2>问题与重点诊断 '+badge('fact','数据事实')+' '+badge('judge','分析判断')+'</h2>';
+  h+='<div class="card"><h3>公司整体</h3><div class="diag">'
+    +'<div><b>'+badge('fact','数据事实')+'</b><ul class="facts">'+m.diag.company.facts.map(f=>'<li>'+f+'</li>').join('')+'</ul></div>'
+    +'<div><b>'+badge('judge','分析判断')+'</b><ul class="judge">'+m.diag.company.judge.map(f=>'<li>'+f+'</li>').join('')+'</ul></div>'
+    +'</div><p style="background:var(--lorange);border-radius:8px;padding:10px 14px;margin:10px 0"><b>本月最重要/最紧迫的事:</b>'+m.diag.company.top+'</p>'
+    +'<div class="actions"><b>改进建议与行动方案(按优先级):</b>'
+    +m.diag.company.actions.map(a=>'<div class="act"><span class="pri '+(a.pri==='P0'?'':a.pri.toLowerCase())+'">'+a.pri+'</span><span class="body">'+a.a+'<br><span class="src"><b>责任层级:</b>'+a.owner+'</span></span></div>').join('')
+    +'</div></div>';
+  // 事业部诊断
+  h+='<div class="lvl3">';
+  m.diag.bus.forEach(b=>{
+    h+='<details><summary>事业部诊断 · '+b.n+'</summary><div class="inner"><div class="diag">'
+      +'<div>'+badge('fact','数据事实')+'<ul class="facts">'+b.f.map(f=>'<li>'+f+'</li>').join('')+'</ul></div>'
+      +'<div>'+badge('judge','分析判断')+'<ul class="judge">'+b.j.map(f=>'<li>'+f+'</li>').join('')+'</ul></div>'
+      +'</div><div class="actions">'+b.act.map(a=>'<div class="act"><span class="pri '+(a.pri==='P0'?'':a.pri.toLowerCase())+'">'+a.pri+'</span><span class="body">'+a.a+'<br><span class="src"><b>责任层级:</b>'+a.owner+'</span></span></div>').join('')+'</div></div></details>';
+  });
+  // 板块诊断
+  m.diag.plant.forEach(p=>{
+    h+='<details><summary>板块诊断 · '+p.n+'('+p.t+')</summary><div class="inner"><p>'+p.d+'</p></div></details>';
+  });
+  h+='</div></div>';
+  document.getElementById('content').innerHTML=h;
+  document.getElementById('foot').innerHTML='<b>数据来源:</b>D:\\上海精智\\2026\\AI管理\\公司月度经营\\'+m.pdf+' | <b>数据截止:</b>'+m.pub+' | 生成:2026-09-20 | 全部数字可追溯至对应月度经营报告总览表;3月报告概览页为图片未能提取文字,相关风险项已标"未披露"。历史月份内容保留,新增月份自动追加页签。';
+}
+function kpi(k,v,d,cls){
+  return '<div class="kpi '+(cls==='gray'?'':cls)+'"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div></div>';
+}
+// ---------- 资料更新检测 ----------
+function updList(ups){
+  return '<ul>'+ups.map(u=>'<li><b>'+u.type+'</b> · '+u.file+(u.mtime?' · '+u.mtime:'')+(u.size?' · '+(u.size/1024/1024).toFixed(1)+'MB':'')+'</li>').join('')+'</ul>';
+}
+function checkUpdate(){
+  const st=document.getElementById('updStatus');
+  const p=document.getElementById('updPanel');
+  st.textContent='检查中…';
+  fetch('http://127.0.0.1:8765/api/check',{cache:'no-store'})
+  .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  .then(d=>{
+    if(d.hasUpdate){
+      p.innerHTML='<div class="updbox warn"><b>⚠️ 检测到 '+d.updates.length+' 处数据更新(名称/时间如下),需要增量分析:</b>'+updList(d.updates)
+        +'<div class="hint">更新范围:月度报告/营销汇报/其他关键主题(文件夹)+ 管理层最新周报(执委会群)<br>正在生成待更新任务文件…</div></div>';
+      st.textContent='⚠️ 有 '+d.updates.length+' 处更新,需增量分析';
+      fetch('http://127.0.0.1:8765/api/analyze',{method:'POST',cache:'no-store'})
+      .then(r=>r.json())
+      .then(t=>{
+        if(t.hasUpdate===false){
+          p.innerHTML='<div class="updbox ok"><b>✅ 数据无更新,无需重新分析</b></div>';
+          st.textContent='✅ 数据无更新,无需重新分析';
+        }else{
+          p.innerHTML='<div class="updbox warn"><b>⚠️ 检测到 '+d.updates.length+' 处数据更新,需要增量分析:</b>'+updList(d.updates)
+            +'<div class="hint">✅ 已生成待更新任务文件:<br><code>'+t.taskFile+'</code><br>'
+            +'任务文件记录了变化清单与分析指引(含其他关键主题、管理层最新周报的更新步骤)——把任务交给 Claude 执行:复制下面这句话发送给 Claude(本机 Claude Code 窗口)即可开始增量分析:<br>'
+            +'<code>更新经营分析</code> <button onclick="copyCmd()">复制</button></div></div>';
+        }
+      })
+      .catch(()=>{});
+    }else{
+      let lastHtml='';
+      if(d.lastUpdates && d.lastUpdates.length){
+        lastHtml='<div class="updbox last">上次检测到的更新(如尚未重新分析,请发给 Claude):'+updList(d.lastUpdates)+'</div>';
+      }
+      p.innerHTML='<div class="updbox ok"><b>✅ 数据无更新,无需重新分析</b>(检查时间 '+d.checkedAt+';已分析清单与文件夹一致)</div>'+lastHtml;
+      st.textContent='✅ 数据无更新,无需重新分析';
+    }
+  })
+  .catch(e=>{
+    p.innerHTML='<div class="updbox err"><b>❌ 本地检测服务未启动</b> — 请先双击运行 <code>D:\\个人资料\\Claude\\MD\\启动经营分析更新服务_20260920_1625.bat</code>(保持窗口打开),再点此按钮。</div>';
+    st.textContent='❌ 检测服务未启动';
+  });
+}
+function copyCmd(){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText('更新经营分析').then(()=>{alert('已复制:更新经营分析');}).catch(()=>{});
+  }else{
+    alert('请手动复制:更新经营分析');
+  }
+}
+// ---------- 每30分钟自动检查 ----------
+function autoCheck(){
+  const last=document.getElementById('updLast');
+  fetch('http://127.0.0.1:8765/api/check',{cache:'no-store'})
+  .then(r=>{ if(!r.ok) throw new Error(); return r.json(); })
+  .then(d=>{
+    if(d.hasUpdate){
+      const p=document.getElementById('updPanel');
+      const st=document.getElementById('updStatus');
+      p.innerHTML='<div class="updbox warn"><b>⚠️ 自动检查发现 '+d.updates.length+' 处数据更新(文件夹/周报),需要增量分析:</b>'+updList(d.updates)
+        +'<div class="hint">点击上方「数据更新」按钮生成任务文件,再把任务交给 Claude 执行。</div></div>';
+      st.textContent='⚠️ 自动检查发现更新('+d.checkedAt+')';
+      last.textContent='上次自动检查:'+d.checkedAt+' · 发现更新';
+    }else{
+      last.textContent='上次自动检查:'+d.checkedAt+' · 无变化';
+    }
+  })
+  .catch(()=>{
+    last.textContent='自动检查:检测服务未启动(启动后恢复)';
+  });
+}
+render(MONTHS.find(m=>m.default));
+autoCheck();
+setInterval(autoCheck,30*60*1000);
+</script>
+</body>
+</html>
