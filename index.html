@@ -732,7 +732,7 @@ function renderWeekly(){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   [...document.querySelectorAll('.tab')].find(t=>t.textContent==='管理层周报').classList.add('active');
   let h='';
-  h+='<p class="note">数据来源:'+WEEKLY.source+' | 更新时间:'+WEEKLY.updatedAt+' | <b>每人仅显示执委会群内最新一期周报</b>(已剔除更早历史期次);每条周报均标注来源时间与期次;周报正文中的表格/图片附件无法在网页解析,已标注"详见附件"并附钉钉原文链接(需钉钉账号打开)。</p>';
+  h+='<p class="note">数据来源:'+WEEKLY.source+' | 更新时间:'+WEEKLY.updatedAt+' | <b>每人仅显示执委会群内最新一期周报</b>(已剔除更早历史期次);每条周报均标注来源时间与期次;周报正文与表格/图片内容均已提取总结(OCR+日志系统全文),点击"查看原文周报"可核对原始表单(需钉钉账号)。</p>';
   h+='<div class="sec"><h2>本周关键数据(管理层周报口径)</h2><div class="card"><ul class="clean">'
    +WEEKLY.key.map(k=>'<li>'+k+'</li>').join('')+'</ul></div></div>';
   h+='<div class="sec"><h2>本周整体总结(跨周报综合分析)</h2><div class="card"><ul class="clean">'
