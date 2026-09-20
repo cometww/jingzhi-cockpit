@@ -1134,6 +1134,12 @@ function autoCheck(){
   });
 }
 render(MONTHS.find(m=>m.default));
+// 触屏设备(手机/平板)隐藏数据更新栏——更新需在电脑端执行
+if(navigator.maxTouchPoints>1 || 'ontouchstart' in window){
+  const hb=document.querySelector('.updbar'); if(hb)hb.style.display='none';
+  const hp=document.getElementById('updPanel'); if(hp)hp.style.display='none';
+  const hn=document.querySelector('.updnote'); if(hn)hn.style.display='none';
+}
 autoCheck();
 setInterval(autoCheck,30*60*1000);
 </script>
