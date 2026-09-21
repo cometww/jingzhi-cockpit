@@ -20,7 +20,7 @@ def gh(*args):
 ok = True
 for f in FILES:
     if not os.path.exists(f):
-        print("跳过(不存在):", f)
+        print("[SKIP] 跳过:", f)
         continue
     path = urllib.parse.quote(f, safe="")
     # 1. 取当前 sha(更新已有文件需要)
@@ -41,10 +41,10 @@ for f in FILES:
     # 3. PUT 上传
     r = gh("-X", "PUT", "repos/%s/contents/%s" % (REPO, path), "--input", "_body.json")
     if r.returncode == 0 and '"sha"' in (r.stdout or ""):
-        print("✅ 已上传:", f)
+        print("[OK] 已上传:", f)
     else:
         ok = False
-        print("❌ 失败:", f, (r.stdout or r.stderr)[:300])
+        print("[FAIL] 失败:", f, (r.stdout or r.stderr)[:300])
 
 os.remove("_body.json") if os.path.exists("_body.json") else None
-print("全部完成" if ok else "存在失败项,请检查输出")
+print("[DONE] 全部完成" if ok else "[WARN] 存在失败项,请检查输出")

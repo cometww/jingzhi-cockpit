@@ -794,25 +794,22 @@ function urgeSend(btn,item){
   const person=item.p, task=item.t, d=item.d;
   const msg='【经营驾驶舱·任务催办】'+task+'(时限:'+d+';来源:'+item.src+')。请跟进推进,并在周报/群内反馈进展,谢谢!';
   btn.textContent='发送中…';btn.disabled=true;
-  fetch('http://127.0.0.1:8765/api/urge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person:person,msg:msg})})
+  const link='dingtalk://dingtalkclient/action/sendmsg?corpId=ding27295497fa81748135c2f4657eb6378f&content='+encodeURIComponent(msg);
+  fetchT('http://127.0.0.1:8765/api/urge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person:person,msg:msg})})
   .then(r=>r.json())
-  .then(d=>{
-    if(d.ok){btn.textContent='✅ 已发送';alert('催办已发送给 '+person+' 的钉钉');}
-    else{btn.textContent='⚠️ 重试';alert('发送失败:'+(d.message||''));}
+  .then(d2=>{
+    if(d2.ok){btn.textContent='✅ 已发送';setTimeout(()=>{btn.textContent='📤 发送催办';btn.disabled=false;},3000);}
+    else{btn.textContent='📱 打开钉钉发送';btn.outerHTML='<a class="urgebtn" style="text-decoration:none;display:inline-block" href="'+link+'" title="未连接电脑端检测服务;点击打开钉钉,选择收件人「'+person+'」发送即可">📱 打开钉钉发送</a>';}
   })
   .catch(()=>{
-    btn.textContent='📱 钉钉发送';
-    const link='dingtalk://dingtalkclient/action/sendmsg?corpId=ding27295497fa81748135c2f4657eb6378f&content='+encodeURIComponent(msg);
-    if(confirm('未连接电脑端检测服务(手机端)。将打开钉钉,自动填好催办消息,选择收件人「'+person+'」发送即可。')){
-      location.href=link;
-    }
+    btn.outerHTML='<a class="urgebtn" style="text-decoration:none;display:inline-block" href="'+link+'" title="未连接电脑端检测服务(手机/平板端属正常);点击打开钉钉,消息已自动填好,选择收件人「'+person+'」发送即可">📱 打开钉钉发送</a>';
   });
 }
 function renderUrge(){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   [...document.querySelectorAll('.tab')].find(t=>t.textContent==='任务催办').classList.add('active');
   let h='';
-  h+='<p class="note">从管理层周报(W38)、晨会纪要、经营分析会材料中提取的重点待办任务,按优先级排列。点击「发送催办」→ 电脑端直接通过钉钉私聊发给责任人;手机端将打开钉钉自动填好消息,选择收件人发送。发送后请对方在周报/群内反馈进展。</p>';
+  h+='<p class="note">从管理层周报(W38)、晨会纪要、经营分析会材料中提取的重点待办任务,按优先级排列。点击「发送催办」:电脑端(检测服务运行中)直接通过钉钉私聊发给责任人;手机/平板端约4秒后按钮变为「📱 打开钉钉发送」,点击即跳转钉钉、消息自动填好,选择收件人发送即可。发送后请对方在周报/群内反馈进展。</p>';
   const cats=[];
   URGE.forEach(u=>{if(!cats.includes(u.cat))cats.push(u.cat);});
   cats.forEach(cat=>{
