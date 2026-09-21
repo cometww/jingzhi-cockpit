@@ -93,6 +93,8 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:v
 .urgebtn{background:var(--dark);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
 .urgebtn:hover{background:var(--blue)}
 .urgebtn:disabled{background:#9aa5b5;cursor:default}
+.urgebtn.done{background:#2e7d32;color:#fff}
+.urgebtn.done:hover{background:#3c9c42}
 .chartbox{margin:16px 0 22px}
 .charttitle{font-weight:700;color:var(--dark);font-size:13.5px;margin-bottom:6px}
 .chartgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 26px}
@@ -161,7 +163,8 @@ const MONTHS=[
  {n:'工艺事业部',rev:'1,657',mgn:'506',cumRev:'10,626',cumMgn:'2,955',mom:'13',yoy:'2,077',flag:'',note:'利润压舱石:武汉工艺(累计管理利润2,330万)撑起大局;康桥工厂累计同比-444万,为主要拖累'},
  {n:'供应链事业部',rev:'1,462',mgn:'-245',cumRev:'7,973',cumMgn:'-1,921',mom:'224',yoy:'2,371',flag:'warn',note:'收入同比+2,371万,但利润同比-1,471万,增收不增利;六安/淮安工厂深度亏损(累计-838/-503万)'},
  {n:'智能事业部',rev:'2,527',mgn:'215',cumRev:'8,787',cumMgn:'9',mom:'-123',yoy:'5,925',flag:'warn',note:'累计完成率48%,剔除专项3,458万后仅29%;嘉定/上海车间已放量,康桥车间累计亏损24万'},
- {n:'通讯5G',rev:'2,261',mgn:'-142',cumRev:'9,884',cumMgn:'100',mom:'-375',yoy:'3,235',flag:'',note:'累计完成率33%,剔除专项4,082万后仅19%,为各事业部最低;8月管理利润转负(-142万)'},
+ {n:'亿泊工厂',rev:'1,124',mgn:'68',cumRev:'7,600',cumMgn:'713',mom:'45',yoy:'1,380',flag:'ok',note:'独立板块(5G体系,单独核算,不并入通讯5G小计)'},
+ {n:'南昌工厂',rev:'216',mgn:'49',cumRev:'1,216',cumMgn:'21',mom:'106',yoy:'-448',flag:'',note:'独立板块(5G体系,单独核算,不并入通讯5G小计)'},
  {n:'利敬&三远',rev:'571',mgn:'7',cumRev:'4,406',cumMgn:'391',mom:'-6',yoy:'543',flag:'ok',note:'稳定盈利单元,累计管理利润391万,同比+98万'},
  {n:'蓝沃数科',rev:'19',mgn:'-344',cumRev:'167',cumMgn:'-2,150',flag:'',note:'累计完成率18%,累计亏损2,150万,收入变现路径未通'},
  {n:'总部及其他',rev:'-',mgn:'-492',cumRev:'-',cumMgn:'-6,310',flag:'warn',note:'含IPO费用(港股),8月累计2,210万,持续推高费用基数'}],
@@ -227,7 +230,8 @@ const MONTHS=[
  {n:'工艺事业部',rev:'1,644',mgn:'452',cumRev:'8,970',cumMgn:'2,449',mom:'-385',yoy:'1,555',flag:'',note:'收入环比-385万(6月交付高峰后回落),累计仍为盈利主力'},
  {n:'供应链事业部',rev:'1,238',mgn:'-144',cumRev:'6,511',cumMgn:'-1,676',mom:'140',yoy:'1,592',flag:'warn',note:'收入同比增长,但累计亏损1,676万,同比增亏1,337万'},
  {n:'智能事业部',rev:'2,650',mgn:'647',cumRev:'6,260',cumMgn:'-206',mom:'-151',yoy:'3,823',flag:'',note:'完成率34%,剔除专项3,458万后仅15%;当月利润+647万,累计接近盈亏平衡'},
- {n:'通讯5G',rev:'2,636',mgn:'649',cumRev:'7,623',cumMgn:'242',mom:'-1,195',yoy:'1,646',flag:'warn',note:'完成率25%,剔除专项4,212万后仅11.3%;6月集中交付后大幅回落'},
+ {n:'亿泊工厂',rev:'1,079',mgn:'46',cumRev:'6,476',cumMgn:'646',mom:'19',yoy:'1,251',flag:'ok',note:'独立板块(5G体系,单独核算,不并入通讯5G小计)'},
+ {n:'南昌工厂',rev:'111',mgn:'-19',cumRev:'999',cumMgn:'-28',mom:'-431',yoy:'-461',flag:'',note:'独立板块(5G体系,单独核算,不并入通讯5G小计)'},
  {n:'利敬&三远',rev:'577',mgn:'53',cumRev:'3,835',cumMgn:'389',mom:'-116',yoy:'558',flag:'ok',note:''},
  {n:'蓝沃数科',rev:'14',mgn:'-289',cumRev:'148',cumMgn:'-1,804',flag:'',note:'累计完成率16%'},
  {n:'总部及其他',rev:'-',mgn:'-782',cumRev:'-',cumMgn:'-5,825',flag:'warn',note:'IPO费用按月约150万持续计入'}],
@@ -291,7 +295,8 @@ const MONTHS=[
  {n:'工艺事业部',rev:'2,028.4',mgn:'779.9',cumRev:'7,325.9',cumMgn:'1,995.7',mom:'699',yoy:'1,061.2',flag:'ok',note:'6月交付高峰,收入环比+699万,利润创年内单月新高'},
  {n:'供应链事业部',rev:'1,097.7',mgn:'-218.9',cumRev:'5,273.4',cumMgn:'-1,531.7',mom:'127.7',yoy:'1,025.7',flag:'warn',note:'收入恢复但亏损依旧,累计同比增亏1,259.6万'},
  {n:'智能事业部',rev:'2,801.4',mgn:'826.4',cumRev:'3,610.1',cumMgn:'-851.5',mom:'2,490.5',yoy:'1,554.3',flag:'',note:'单月放量(嘉定1,714万/上海2,176万),完成率20%→6月大幅改善,但累计仍亏损'},
- {n:'通讯5G',rev:'3,830.7',mgn:'391.5',cumRev:'4,986.4',cumMgn:'-407.2',mom:'3,207.7',yoy:'-117.1',flag:'warn',note:'收入环比+3,208万(集中交付),但累计完成率仅17%'},
+ {n:'亿泊工厂',rev:'1,059.5',mgn:'94.7',cumRev:'5,397.3',cumMgn:'599.6',mom:'-28.8',yoy:'992.2',flag:'ok',note:'独立板块(5G体系,单独核算,不并入通讯5G小计)'},
+ {n:'南昌工厂',rev:'541.1',mgn:'129.3',cumRev:'888.7',cumMgn:'-9.4',mom:'513.9',yoy:'-494.8',flag:'',note:'独立板块(5G体系,单独核算,不并入通讯5G小计)'},
  {n:'利敬&三远',rev:'692.2',mgn:'104',cumRev:'3,258.6',cumMgn:'335.8',mom:'45.2',yoy:'467.4',flag:'ok',note:''},
  {n:'蓝沃数科',rev:'111.3',mgn:'-180.1',cumRev:'134',cumMgn:'-1,514.1',flag:'',note:'累计完成率14%,当月收入111.3万为年内最高'},
  {n:'总部及其他',rev:'-',mgn:'-511.4',cumRev:'-',cumMgn:'-5,123.9',flag:'warn',note:''}],
@@ -354,7 +359,8 @@ const MONTHS=[
  {n:'工艺事业部',rev:'1,329.4',mgn:'481.2',cumRev:'5,297.5',cumMgn:'1,442.8',mom:'187.3',yoy:'374.5',flag:'ok',note:'盈利主力,武汉工艺单月+408万'},
  {n:'供应链事业部',rev:'970',mgn:'-291.7',cumRev:'4,098.8',cumMgn:'-1,435.4',mom:'-60.6',yoy:'633.4',flag:'',note:'收入同比+633万,但累计亏损1,435万,同比增亏1,196万'},
  {n:'智能事业部',rev:'310.9',mgn:'-307.4',cumRev:'808.7',cumMgn:'-1,678',mom:'216.9',yoy:'-899.8',flag:'',note:'同比收入腰斩,嘉定/上海车间深亏'},
- {n:'通讯5G',rev:'623',mgn:'-162.9',cumRev:'1,155.7',cumMgn:'-798.7',mom:'423.3',yoy:'-3,054.8',flag:'',note:'收入同比-3,055万,为最大同比缺口'},
+ {n:'亿泊工厂',rev:'1,088.3',mgn:'138.2',cumRev:'4,337.9',cumMgn:'504.9',mom:'187.7',yoy:'714.4',flag:'ok',note:'独立板块(5G体系,单独核算,不并入通讯5G小计)'},
+ {n:'南昌工厂',rev:'27.2',mgn:'-32.6',cumRev:'347.6',cumMgn:'-138.7',mom:'-80.4',yoy:'-220.5',flag:'',note:'独立板块(5G体系,单独核算,不并入通讯5G小计)'},
  {n:'利敬&三远',rev:'647',mgn:'71.4',cumRev:'2,566.4',cumMgn:'231.9',mom:'16.9',yoy:'314.6',flag:'ok',note:''},
  {n:'蓝沃数科',rev:'22.7',mgn:'-314.2',cumRev:'22.7',cumMgn:'-1,334',flag:'',note:'当月首笔收入22.7万'},
  {n:'总部及其他',rev:'-',mgn:'-529.4',cumRev:'-',cumMgn:'-2,648.9',flag:'warn',note:''}],
@@ -416,7 +422,8 @@ const MONTHS=[
  {n:'工艺事业部',rev:'1,154.1',mgn:'340.9',cumRev:'2,826',cumMgn:'629.2',mom:'389.9',yoy:'-155.3',flag:'ok',note:'唯一稳定盈利的事业部,武汉工艺单月+336.7万'},
  {n:'供应链事业部',rev:'914.6',mgn:'-270.1',cumRev:'2,070.6',cumMgn:'-948.6',mom:'473.3',yoy:'39.8',flag:'',note:'收入回升,累计亏损948.6万,同比增亏794.4万'},
  {n:'智能事业部',rev:'160.4',mgn:'-360.3',cumRev:'403.7',cumMgn:'-964.3',mom:'100.2',yoy:'-130.9',flag:'',note:'嘉定/上海车间深亏(合计-450万),收入同比-131万'},
- {n:'通讯5G',rev:'57.7',mgn:'-175.4',cumRev:'333.1',cumMgn:'-446.6',mom:'12.2',yoy:'-1,999.6',flag:'',note:'收入同比-2,000万,断崖式下滑'},
+ {n:'亿泊工厂',rev:'900.7',mgn:'190.9',cumRev:'2,349.1',cumMgn:'301.8',mom:'405.9',yoy:'154.8',flag:'ok',note:'独立板块(5G体系,单独核算,不并入通讯5G小计)'},
+ {n:'南昌工厂',rev:'51.4',mgn:'-28.2',cumRev:'212.8',cumMgn:'-76.5',mom:'-64.8',yoy:'71.9',flag:'',note:'独立板块(5G体系,单独核算,不并入通讯5G小计)'},
  {n:'利敬&三远',rev:'551.6',mgn:'52.1',cumRev:'1,289.3',cumMgn:'99.4',mom:'271.1',yoy:'-0.8',flag:'ok',note:''},
  {n:'蓝沃数科',rev:'-',mgn:'-238.7',cumRev:'-',cumMgn:'-685.6',flag:'',note:''},
  {n:'总部及其他',rev:'-',mgn:'-521.1',cumRev:'-',cumMgn:'-1,678.7',flag:'warn',note:''}],
@@ -793,12 +800,24 @@ const URGE=[
 function urgeSend(btn,item){
   const person=item.p, task=item.t, d=item.d;
   const msg='【经营驾驶舱·任务催办】'+task+'(时限:'+d+';来源:'+item.src+')。请跟进推进,并在周报/群内反馈进展,谢谢!';
-  btn.textContent='发送中…';btn.disabled=true;
   const link='dingtalk://dingtalkclient/action/sendmsg?corpId=ding27295497fa81748135c2f4657eb6378f&content='+encodeURIComponent(msg);
+  const isTouch=(navigator.maxTouchPoints>1||'ontouchstart' in window);
+  if(isTouch){
+    // 触屏设备(手机/平板):立即给出钉钉深链,不等电脑服务
+    btn.outerHTML='<a class="urgebtn" style="text-decoration:none;display:inline-block" href="'+link+'" title="点击打开钉钉,消息已自动填好,选择收件人「'+person+'」发送即可">📱 打开钉钉发送</a>';
+    return;
+  }
+  btn.textContent='发送中…';btn.disabled=true;
   fetchT('http://127.0.0.1:8765/api/urge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person:person,uid:item.uid||'',msg:msg})},10000)
   .then(r=>r.json())
   .then(d2=>{
-    if(d2.ok){btn.textContent='✅ 已发送';setTimeout(()=>{btn.textContent='📤 发送催办';btn.disabled=false;},3000);}
+    if(d2.ok){
+      const now=new Date();
+      const tstr=(now.getMonth()+1)+'/'+now.getDate()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+      try{localStorage.setItem('urge:'+task,tstr);}catch(e){}
+      btn.textContent='✅ 已催办 '+tstr;
+      btn.classList.add('done');btn.disabled=false;
+    }
     else{btn.textContent='📱 打开钉钉发送';btn.outerHTML='<a class="urgebtn" style="text-decoration:none;display:inline-block" href="'+link+'" title="未连接电脑端检测服务;点击打开钉钉,选择收件人「'+person+'」发送即可">📱 打开钉钉发送</a>';}
   })
   .catch(()=>{
@@ -818,10 +837,12 @@ function renderUrge(){
      +'<tr><th style="width:60px">优先级</th><th>任务</th><th style="width:80px">责任人</th><th style="width:95px">时限</th><th style="width:130px">来源</th><th style="width:130px">操作</th></tr>';
     items.forEach(u=>{
       const priCls=u.pri==='P0'?'':u.pri.toLowerCase();
+      let doneT='';
+      try{doneT=localStorage.getItem('urge:'+u.t)||'';}catch(e){}
       h+='<tr><td><span class="pri '+(u.pri==='P0'?'':u.pri.toLowerCase())+'" style="display:inline-block">'+u.pri+'</span></td>'
        +'<td class="l" style="white-space:normal">'+u.t+'</td>'
        +'<td>'+u.p+'</td><td>'+u.d+'</td><td class="l" style="white-space:normal;font-weight:400">'+u.src+'</td>'
-       +'<td><button class="urgebtn" onclick="urgeSend(this,URGE['+URGE.indexOf(u)+'])">📤 发送催办</button></td></tr>';
+       +'<td><button class="urgebtn'+(doneT?' done':'')+'" onclick="urgeSend(this,URGE['+URGE.indexOf(u)+'])" title="'+(doneT?'再次催办':'发送催办')+'">'+(doneT?'✅ 已催办 '+doneT:'📤 发送催办')+'</button></td></tr>';
     });
     h+='</table></div></div>';
   });
@@ -856,8 +877,12 @@ function renderSummary(){
       {name:'管理利润',color:'#c0392b',vals:[-1310.1,-1292.7,1031.9,270,-767]}]})
    +'</div></div>';
   // 事业部收入/利润
-  const BREV={'工艺事业部':[1154.1,1329.4,2028.4,1644,1657],'供应链事业部':[914.6,970,1097.7,1238,1462],'智能事业部':[160.4,310.9,2801.4,2650,2527],'通讯5G':[57.7,623,3830.7,2636,2261],'利敬&三远':[551.6,647,692.2,577,571],'蓝沃数科':[null,22.7,111.3,14,19]};
-  const BMGN={'工艺事业部':[340.9,481.2,779.9,452,506],'供应链事业部':[-270.1,-291.7,-218.9,-144,-245],'智能事业部':[-360.3,-307.4,826.4,647,215],'通讯5G':[-175.4,-162.9,391.5,649,-142],'利敬&三远':[52.1,71.4,104,53,7],'蓝沃数科':[-238.7,-314.2,-180.1,-289,-344]};
+  const BREV={'工艺事业部':[1154.1,1329.4,2028.4,1644,1657],'供应链事业部':[914.6,970,1097.7,1238,1462],'智能事业部':[160.4,310.9,2801.4,2650,2527],'通讯5G(东莞)':[57.7,623,3830.7,2636,2261],
+ '亿泊工厂':[900.7,1088.3,1059.5,1079,1124],
+ '南昌工厂':[51.4,27.2,541.1,111,216],'利敬&三远':[551.6,647,692.2,577,571],'蓝沃数科':[null,22.7,111.3,14,19]};
+  const BMGN={'工艺事业部':[340.9,481.2,779.9,452,506],'供应链事业部':[-270.1,-291.7,-218.9,-144,-245],'智能事业部':[-360.3,-307.4,826.4,647,215],'通讯5G(东莞)':[-175.4,-162.9,391.5,649,-142],
+ '亿泊工厂':[190.9,138.2,94.7,46,68],
+ '南昌工厂':[-28.2,-32.6,129.3,-19,49],'利敬&三远':[52.1,71.4,104,53,7],'蓝沃数科':[-238.7,-314.2,-180.1,-289,-344]};
   h+='<div class="sec"><h2>业绩曲线 · ② 各事业部(当月收入,万元)</h2><div class="card">'
    +drawLine({title:'各事业部收入曲线',labels:LBL,note:'6月智能/5G集中放量后回落;蓝沃3月收入为0(曲线起点缺失)',
      series:Object.keys(BREV).map((k,i)=>({name:k,color:COLORS[i],vals:BREV[k]}))})
@@ -871,7 +896,7 @@ function renderSummary(){
    '工艺事业部':{'康桥工厂':[302.6,377.2,942.1,573,687],'嘉定工厂':[131.6,113.7,321.4,56,93],'平湖工厂':[9.3,3,24.7,15,14],'上海工厂':[443.5,494,1288.2,644,793],'武汉工艺':[664.5,779.1,679.6,958,808],'长春工厂':[46.2,56.3,60.6,42,56]},
    '供应链事业部':{'川沙工厂':[495.5,603.7,608.9,516,650],'六安工厂':[152,138.1,173.2,232,412],'淮安工厂':[null,20.5,13.1,136,43],'武汉工厂':[267.1,207.7,302.5,355,357]},
    '智能事业部':{'康桥车间':[56.1,228.3,462.1,1012,757],'嘉定车间':[29.5,14.6,1714.1,1586,1444],'上海工厂':[85.6,242.9,2176.2,2598,2201],'武汉车间':[74.8,68.1,198.2,40,326],'重庆车间':[null,null,427,12,null]},
-   '通讯5G':{'亿泊工厂':[900.7,1088.3,1059.5,1079,1124],'南昌工厂':[51.4,27.2,541.1,111,216]},
+   '5G体系·三个独立板块':{'通讯5G(东莞)':[57.7,623,3830.7,2636,2261],'亿泊工厂':[900.7,1088.3,1059.5,1079,1124],'南昌工厂':[51.4,27.2,541.1,111,216]},
    '其他':{'利敬':[139,121,219.7,94,109],'三远':[412.7,526,472.5,483,462],'蓝沃数科':[null,22.7,111.3,14,19]}
   };
   h+='<div class="sec"><h2>业绩曲线 · ④ 各板块(当月收入,万元)</h2>';
@@ -905,6 +930,8 @@ function renderSummary(){
    +'<tr><td class="l">供应链事业部</td><td>7,973</td><td class="neg">-1,921</td><td>未披露</td><td class="l">增收不增利,六安/淮安深亏</td></tr>'
    +'<tr><td class="l">智能事业部</td><td>8,787</td><td class="pos">+9</td><td>48%(剔除专项29%)</td><td class="l">靠专项撑量,6月起放量,刚达盈亏平衡</td></tr>'
    +'<tr><td class="l">通讯5G</td><td>9,884</td><td class="pos">+100</td><td>33%(剔除专项19%)</td><td class="l">完成率最低,8月利润转负</td></tr>'
+   +'<tr><td class="l">亿泊工厂(独立)</td><td>7,600</td><td class="pos">+713</td><td>未披露</td><td class="l">5G体系内独立核算,累计利润为正</td></tr>'
+   +'<tr><td class="l">南昌工厂(独立)</td><td>1,216</td><td class="pos">+21</td><td>74.30%</td><td class="l">5G体系内独立核算,完成率较好</td></tr>'
    +'<tr><td class="l">利敬&三远</td><td>4,406</td><td class="pos">+391</td><td>未披露</td><td class="l">稳定盈利</td></tr>'
    +'<tr><td class="l">蓝沃数科</td><td>167</td><td class="neg">-2,150</td><td>18%</td><td class="l">商业模式待验证,持续失血</td></tr>'
    +'<tr><td class="l">总部及其他</td><td>—</td><td class="neg">-6,310</td><td>—</td><td class="l">含IPO费用2,210万,费用刚性</td></tr>'
@@ -927,6 +954,7 @@ function renderSummary(){
    +'<tr><td class="l">塑胶科技</td><td>9,257.59</td><td>13,002.57</td><td>71.20%</td><td class="l">各板块完成率最高</td></tr>'
    +'<tr><td class="l">供应链电子化</td><td>8,463.43</td><td>20,113.01</td><td>42.08%</td><td class="l">六安22.69%/淮安7.21%严重拖累;挑战目标调整为1.8亿</td></tr>'
    +'<tr><td class="l">通讯5G(东莞)</td><td>16,875.54</td><td>46,000</td><td>36.69%</td><td class="l">在手订单含已中标未下单11,491.33万,转化是关键</td></tr>'
+   +'<tr><td class="l">亿泊工厂(独立)</td><td>未披露</td><td>未披露</td><td>未披露</td><td class="l">8月营销汇报未单独披露亿泊订单口径</td></tr>'
    +'<tr><td class="l">南昌/利敬/三远</td><td>2,228.96/1,054.18/3,589.84</td><td>3,000/1,234.02/5,765.94</td><td>74.30%/85.43%/62.26%</td><td class="l">小体量高完成率,基本盘稳</td></tr>'
    +'<tr><td class="l">集团合计</td><td>62,411.86</td><td>133,918.37</td><td>46.60%</td><td class="l">同比+46.98%;落后时间进度(9/12≈75%)28个百分点</td></tr>'
    +'</table><p class="note">来源:9月经营分析会《营销管理中心工作汇报@20260916》;5G订单含已下单5,384.21万+已中标未下单11,491.33万</p></div></div>';
