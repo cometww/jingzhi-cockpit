@@ -177,6 +177,14 @@ class H(BaseHTTPRequestHandler):
         else:
             self._json({"ok": True, "service": "经营分析更新检测服务 v2",
                         "hint": "GET /api/check | POST /api/analyze | GET /api/status"})
+    def do_OPTIONS(self):
+        """响应浏览器 CORS 预检请求(否则带 JSON 头的 POST 会被浏览器拦截)"""
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Max-Age", "86400")
+        self.end_headers()
     def do_POST(self):
         if self.path.startswith("/api/analyze"):
             has, ups, _ = diff_check(save=True)
@@ -196,6 +204,7 @@ class H(BaseHTTPRequestHandler):
             except Exception:
                 body = {}
             person = (body.get("person") or "").strip()
+            uid = (body.get("uid") or "").strip()
             msg = (body.get("msg") or "").strip()
             if not person or not msg:
                 self._json({"ok": False, "message": "缺少 person/msg 参数"})
@@ -203,13 +212,18 @@ class H(BaseHTTPRequestHandler):
             if body.get("dry"):
                 self._json({"ok": True, "dry": True, "person": person, "msg": msg})
                 return
+            # 优先按 userId 直发(解决重名歧义,如"刘超");否则按姓名解析发送
+            cmd = (["dws", "chat", "+messages-send", "--as", "user", "--user", uid, "--text", msg, "-y"]
+                   if uid else
+                   ["dws", "chat", "+dm", "--to", person, "--content", msg, "-y"])
             try:
-                p = subprocess.run(
-                    ["dws", "chat", "+dm", "--to", person, "--content", msg, "-y"],
-                    capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120)
-                self._json({"ok": True, "person": person,
+                p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
+                                   errors="replace", timeout=120)
+                detail = (p.stdout or p.stderr or "")[:400]
+                ok_flag = p.returncode == 0 and ("success" in detail.lower() or "errorcode" in detail.lower() and "null" in detail.lower())
+                self._json({"ok": ok_flag, "person": person,
                             "sentAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                            "detail": (p.stdout or "")[:300]})
+                            "detail": detail})
             except Exception as e:
                 self._json({"ok": False, "message": "发送失败: %s" % e})
         else:

@@ -767,15 +767,15 @@ const URGE=[
  {cat:'生产制造',t:'压铸沙眼改善方案(W38遗留项,9/22报告)',p:'蒋芳平',d:'2026-09-22',pri:'P0',src:'汪伟周报W38'},
  {cat:'生产制造',t:'6533整形模验证方案(W38遗留项,9/22报告)',p:'孟西陵',d:'2026-09-22',pri:'P0',src:'汪伟周报W38'},
  {cat:'生产制造',t:'回收包材破损改善方案(W38遗留项,9/22报告)',p:'郭辉',d:'2026-09-22',pri:'P0',src:'汪伟周报W38'},
- {cat:'生产制造',t:'铂美模具浇口套尺寸异常修复(4#机本周达成率仅6%)',p:'刘超',d:'本周',pri:'P0',src:'刘超周报W38'},
+ {cat:'生产制造',t:'铂美模具浇口套尺寸异常修复(4#机本周达成率仅6%)',p:'刘超',uid:'15845236358872131',d:'本周',pri:'P0',src:'刘超周报W38'},
  {cat:'生产制造',t:'三项逆变器齿片粘模改善(1#机达成80%)',p:'郭寒毅',d:'本周',pri:'P0',src:'刘超周报W38'},
  {cat:'生产制造',t:'5720第三次5000T上机验证(对标湘华产品状态)',p:'郭寒毅',d:'2026-09-25',pri:'P0',src:'汪伟周报W38'},
  {cat:'客户与交付',t:'2116客户能力基线评审现场支持',p:'王开林',d:'2026-09-22',pri:'P0',src:'金悦周报W38'},
  {cat:'客户与交付',t:'99018WTB剩余520件按计划出货',p:'汪友坪',d:'本周',pri:'P0',src:'汪伟周报W38'},
- {cat:'客户与交付',t:'湘华价格周一敲定并走流程(pack+逆变器每件+3元)',p:'刘超',d:'2026-09-21',pri:'P0',src:'汪伟-刘超私聊'},
- {cat:'客户与交付',t:'东莞9月交付缺口(计划4,100万/实际预计2,300万)紧急增补订单',p:'刘超',d:'9月底',pri:'P0',src:'刘超周报W38'},
+ {cat:'客户与交付',t:'湘华价格周一敲定并走流程(pack+逆变器每件+3元)',p:'刘超',uid:'15845236358872131',d:'2026-09-21',pri:'P0',src:'汪伟-刘超私聊'},
+ {cat:'客户与交付',t:'东莞9月交付缺口(计划4,100万/实际预计2,300万)紧急增补订单',p:'刘超',uid:'15845236358872131',d:'9月底',pri:'P0',src:'刘超周报W38'},
  {cat:'客户与交付',t:'Q3回款缺口6,181.6万逐户补救方案;纳铁福/皮尔博格/力邦专项谈判',p:'朱军',d:'9月底',pri:'P0',src:'营销汇报8月期'},
- {cat:'客户与交付',t:'舜富9月底完成NEO pack或单/三项逆变器移模试制',p:'刘超',d:'9月底',pri:'P1',src:'刘超周报W38'},
+ {cat:'客户与交付',t:'舜富9月底完成NEO pack或单/三项逆变器移模试制',p:'刘超',uid:'15845236358872131',d:'9月底',pri:'P1',src:'刘超周报W38'},
  {cat:'供应链',t:'中兴376供应商定点(整体委外超成本,开发更优供应商)',p:'林染',d:'持续',pri:'P0',src:'汪伟/孟西陵周报'},
  {cat:'供应链',t:'呆滞物料处置(亿泊303万,超目标286万)',p:'郑亮',d:'9月底',pri:'P1',src:'郑亮周报W38/呆滞专项'},
  {cat:'供应链',t:'六安感应器寿命协议签订(现状2万件 vs 要求8万件)',p:'黄贤珍',d:'节前',pri:'P1',src:'黄贤珍周报W38'},
@@ -795,7 +795,7 @@ function urgeSend(btn,item){
   const msg='【经营驾驶舱·任务催办】'+task+'(时限:'+d+';来源:'+item.src+')。请跟进推进,并在周报/群内反馈进展,谢谢!';
   btn.textContent='发送中…';btn.disabled=true;
   const link='dingtalk://dingtalkclient/action/sendmsg?corpId=ding27295497fa81748135c2f4657eb6378f&content='+encodeURIComponent(msg);
-  fetchT('http://127.0.0.1:8765/api/urge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person:person,msg:msg})})
+  fetchT('http://127.0.0.1:8765/api/urge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person:person,uid:item.uid||'',msg:msg})},10000)
   .then(r=>r.json())
   .then(d2=>{
     if(d2.ok){btn.textContent='✅ 已发送';setTimeout(()=>{btn.textContent='📤 发送催办';btn.disabled=false;},3000);}
@@ -1047,9 +1047,9 @@ function kpi(k,v,d,cls){
 function updList(ups){
   return '<ul>'+ups.map(u=>'<li><b>'+u.type+'</b> · '+u.file+(u.mtime?' · '+u.mtime:'')+(u.size?' · '+(u.size/1024/1024).toFixed(1)+'MB':'')+'</li>').join('')+'</ul>';
 }
-function fetchT(url,opt){
+function fetchT(url,opt,ms){
   const ctrl=new AbortController();
-  const t=setTimeout(()=>ctrl.abort(),4500);
+  const t=setTimeout(()=>ctrl.abort(),ms||4500);
   return fetch(url,Object.assign({cache:'no-store',signal:ctrl.signal},opt)).finally(()=>clearTimeout(t));
 }
 function checkUpdate(){
